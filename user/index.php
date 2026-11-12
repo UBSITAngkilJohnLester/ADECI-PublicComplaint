@@ -13,5 +13,6 @@
 </head>
 <body>
 	<h1>Welcome <?php echo $_SESSION['USERNAME']?></h1>
+	<a href="logout.php">Logout</a>
 </body>
 </html>

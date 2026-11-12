@@ -21,17 +21,20 @@
 					$_SESSION['ID'] = $row['ID'];
 
 					header("location:admin/index.php");
+					exit();
 
 				}
-				else if ($password == $row['password'] && $row['status']=="user") {
+				else if ($password == $row['password'] && $row['status']== "user") {
 					$_SESSION['USERNAME'] = $row['username'];
 					$_SESSION['FIRSTNAME'] = $row['firstname'];
 					$_SESSION['ID'] = $row['ID'];
 
 					header("location:user/index.php");
+					exit();
 				}
 				else{
 					header("location:index.php");
+					exit();
 				}
 			}
 		}

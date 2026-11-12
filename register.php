@@ -17,6 +17,9 @@
 			$password,
 			$status
 		]);
+
+		header("location:user/index.php");
+
 	}
 ?>
 

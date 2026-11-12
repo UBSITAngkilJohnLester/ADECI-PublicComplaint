@@ -2,6 +2,7 @@
 	require_once "../dbconn.php";
 	session_start();
 
+	echo $_SESSION['ID'];
 ?>
 
 <!DOCTYPE html>
@@ -12,6 +13,15 @@
 	<title></title>
 </head>
 <body>
-	<h1>Welcome <?php echo $_SESSION['USERNAME']?></h1>
+	<h1>Government Monitoring System (Admin)</h1>
+	<nav>
+		<a href="accounts.php">Accounts</a>
+		<a href="logout.php">Logout</a>
+	</nav>
+		
+	<hr>
+	<h2>Complaints</h2>
+
+	
 </body>
 </html>

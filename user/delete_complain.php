@@ -1,14 +1,18 @@
 <?php
-	require_once "../dbconn.php";
+session_start();
+require_once "../dbconn.php";
 
-	$id = $_GET['id'];
-
-	$delete = "DELETE FROM complaints WHERE id = :id";
-	$prep = $pdo->prepare($delete);
-	$prep->execute([
-		":id" => $id
-	]);
-
-	header("location:index.php");
+if (!isset($_SESSION['ID'])) {
+	header("location:../index.php");
 	exit();
+}
+
+$prep = $pdo->prepare("DELETE FROM complaints WHERE id = :id AND acc_id = :accId");
+$prep->execute([
+	":id"    => $_GET['id'],
+	":accId" => $_SESSION['ID']
+]);
+
+header("location:index.php");
+exit();
 ?>

@@ -21,7 +21,7 @@ $select->execute([$id, $_SESSION['ID']]);
 $row = $select->fetch();
 
 // Only Pending complaints can be edited.
-if ($row['status'] != 'Pending') {
+if (!$row) {
 	header("location:index.php");
 	exit();
 }

@@ -70,7 +70,11 @@ $complaints = $stmt->fetchAll();
 							No photo
 						<?php endif; ?>
 					</td>
-					<td><a href="edit_complain.php?id=<?php echo $row['ID']; ?>">Edit</a></td>
+					<td>
+						<?php if ($row['status'] == 'Pending'): ?>
+							<a href="edit_complain.php?id=<?php echo $row['ID']; ?>">Edit</a>
+						<?php endif; ?>
+					</td>
         			<td><a href="delete_complain.php?id=<?php echo $row['ID']; ?>">Delete</a></td>
 			<?php } ?>
 	</table>

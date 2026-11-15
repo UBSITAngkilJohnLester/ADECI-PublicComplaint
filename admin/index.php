@@ -1,8 +1,6 @@
 <?php
 	require_once "../dbconn.php";
 	session_start();
-
-	echo $_SESSION['ID'];
 ?>
 
 <!DOCTYPE html>
@@ -21,6 +19,10 @@
 		
 	<hr>
 	<h2>Complaints</h2>
+
+	<table border="1">
+		<th>Department</th>
+	</table>
 
 	
 </body>

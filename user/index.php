@@ -71,7 +71,10 @@ $complaints = $stmt->fetchAll();
 						<?php endif; ?>
 					</td>
 					<td><a href="edit_complain.php?id=<?php echo $row['ID']; ?>">Edit</a></td>
-        			<td><a href="delete_complain.php?id=<?php echo $row['ID']; ?>">Delete</a></td>
+        			<td>
+        				<a href="delete_complain.php?id=<?php echo $row['ID']; ?>"
+       					onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
+   					</td>
 			<?php } ?>
 	</table>
 </body>

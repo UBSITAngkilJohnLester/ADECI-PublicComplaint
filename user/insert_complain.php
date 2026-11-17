@@ -2,6 +2,12 @@
 require_once "../dbconn.php";
 session_start();
 
+// make sure the user is logged in
+if (!isset($_SESSION['ID'])) {
+	header("location:../index.php");
+	exit();
+}
+
 $errors = [];
 
 // retrieves the category
@@ -19,6 +25,12 @@ if (count($rows) < 1) {
 }
 $department = $rows[0]['department'];
 
+// start empty, so the form has something to show on the first visit
+$description = "";
+$barangay    = "";
+$street      = "";
+$landmark    = "";
+
 if (isset($_POST['submit'])) {
 	$description = trim($_POST['description']);
 	$barangay    = trim($_POST['barangay']);
@@ -30,19 +42,30 @@ if (isset($_POST['submit'])) {
 		$errors[] = "Please fill in all required fields.";
 	}
 
-	// photo insert (optional)
+	// photo checks (optional)
+	$ext = '';
 	if ($_FILES['photo']['error'] != UPLOAD_ERR_NO_FILE) {
-		$ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
 
-		// photo upload checker
-		if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
-			$errors[] = "Only JPG, PNG, or WEBP images are allowed.";
-		// photo was uploaded
+		if ($_FILES['photo']['error'] != UPLOAD_ERR_OK) {
+			$errors[] = "Photo upload failed. The file may be too big.";
 		} else {
-			$newName = uniqid('complaint_') . '.' . $ext;
-			move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . $newName);
-			$photoPath = 'uploads/' . $newName;
+			$ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+			if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+				$errors[] = "Only JPG, PNG, or WEBP images are allowed.";
+			} elseif ($_FILES['photo']['size'] > 5 * 1024 * 1024) {
+				$errors[] = "Image must be 5 MB or smaller.";
+			} elseif (getimagesize($_FILES['photo']['tmp_name']) === false) {
+				$errors[] = "That file is not a real image.";
+			}
 		}
+	}
+
+	// saves the photo only if everything is fine
+	if (empty($errors) && $ext != '') {
+		$newName = uniqid('complaint_') . '.' . $ext;
+		move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . $newName);
+		$photoPath = 'uploads/' . $newName;
 	}
 
 
@@ -103,18 +126,18 @@ if (isset($_POST['submit'])) {
 					<a href="choose_category.php">Change</a>
 				</td>
 			</tr>
-			<tr>
-				<td>Description of Concern</td>
-				<td><textarea name="description" rows="4" cols="40" required></textarea></td>
-			</tr>
-	<tr>
-		<td>Location Details</td>
-		<td>
-			<input type="text" name="barangay" placeholder="Barangay" required>
-			<input type="text" name="street" placeholder="Street / Purok / Subdivision" required>
-			<input type="text" name="landmark" placeholder="Nearest landmark (optional)">
+		<tr>
+			<td>Description of Concern</td>
+			<td><textarea name="description" rows="4" cols="40" required><?php echo htmlspecialchars($description); ?></textarea></td>
+		</tr>
+		<tr>
+			<td>Location Details</td>
+			<td>
+				<input type="text" name="barangay" value="<?php echo htmlspecialchars($barangay); ?>" placeholder="Barangay" maxlength="100" required>
+				<input type="text" name="street" value="<?php echo htmlspecialchars($street); ?>" placeholder="Street / Purok / Subdivision" maxlength="100" required>
+				<input type="text" name="landmark" value="<?php echo htmlspecialchars($landmark); ?>" placeholder="Nearest landmark (optional)" maxlength="100">
 		</td>
-	</tr>
+		</tr>
 
 			<tr>
 				<td>Photo Evidence</td>

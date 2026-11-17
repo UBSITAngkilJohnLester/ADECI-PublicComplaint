@@ -112,7 +112,7 @@ $complaints = $stmt->fetchAll();
 						onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
 				</td>
 				<td>
-					<?php if ($row['status'] == 'Pending') { ?>
+					<?php if ($row['status'] == 'Pending' || $row['status'] == 'In Progress') { ?>
 						<span style="color:gray;">Please wait for further updates</span>
 					<?php } else if ($row['feedback_id']) { ?>
 						Feedback sent

@@ -9,11 +9,25 @@ if (!isset($_SESSION['ID'])) {
 }
 
 // The complaint ID comes from the link: user_feedback.php?id=5
-if (!isset($_SESSION['id'])) {
+// The complaint ID arrives once (from the link or from a form).
+// Save it in the session, then reload this page with a clean URL.
+if (isset($_GET['id'])) {
+	$_SESSION['feedback_complaint_id'] = $_GET['id'];
+	header("location:user_feedback.php");
+	exit();
+}
+if (isset($_POST['complaint_id']) && !isset($_POST['submit'])) {
+	$_SESSION['feedback_complaint_id'] = $_POST['complaint_id'];
+	header("location:user_feedback.php");
+	exit();
+}
+
+// No complaint chosen: go back to the list.
+if (!isset($_SESSION['feedback_complaint_id'])) {
 	header("location:index.php");
 	exit();
 }
-$complaintId = $_SESSION['id'];
+$complaintId = $_SESSION['feedback_complaint_id'];
 
 // The complaint must belong to the logged-in user.
 $select = $pdo->prepare("SELECT ID, reference_no, category FROM complaints WHERE ID = ? AND acc_id = ?");
@@ -21,6 +35,7 @@ $select->execute([$complaintId, $_SESSION['ID']]);
 $complaint = $select->fetch();
 
 if (!$complaint) {
+	unset($_SESSION['feedback_complaint_id']);
 	header("location:index.php");
 	exit();
 }
@@ -29,6 +44,7 @@ if (!$complaint) {
 $check = $pdo->prepare("SELECT ID FROM feedback WHERE complaint_id = ? AND acc_id = ?");
 $check->execute([$complaintId, $_SESSION['ID']]);
 if ($check->fetch()) {
+	unset($_SESSION['feedback_complaint_id']);
 	header("location:index.php");
 	exit();
 }
@@ -52,8 +68,9 @@ if (isset($_POST['submit'])) {
 		":professionalism"   => $_POST['professionalism'],
 		":communication"     => $_POST['communication'],
 		":resolution_status" => $_POST['resolution_status']
-	]);
+		]);
 
+	unset($_SESSION['feedback_complaint_id']);
 	header("location:index.php");
 	exit();
 }

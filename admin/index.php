@@ -18,17 +18,17 @@ $progress = 0;
 $resolved = 0;
 $rejected = 0;
 
-foreach($row as $r){
-	if($r['status'] == "Pending"){
+foreach ($row as $r) {
+	if ($r['status'] == "Pending") {
 		$pending++;
 	}
-	if($r['status'] == "In Progress"){
+	if ($r['status'] == "In Progress") {
 		$progress++;
 	}
-	if($r['status'] == "Resolved"){
+	if ($r['status'] == "Resolved") {
 		$resolved++;
 	}
-	if($r['status'] == "Rejected"){
+	if ($r['status'] == "Rejected") {
 		$rejected++;
 	}
 }
@@ -48,36 +48,70 @@ $latest = $prep->fetchAll();
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Admin Dashboard</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 </head>
+
 <body>
-	<h1>Government Monitoring System (Admin)</h1>
-	<nav>
-		<a href="logout.php">Logout</a>
+	<nav class="navbar bg-secondary-subtle sticky-top p-1">
+		<div class="container-fluid d-flex justify-content-start gap-4">
+			<a href="index.php" class="nav-item nav-link">Dashboard</a>
+			<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
+			<a href="#" class="nav-item nav-link">Announcement</a>
+			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
+		</div>
 	</nav>
-	<hr>
-
-	<h2>Dashboard</h2>
-
-	<table border="1">
-		<tr>
-			<th>Total</th>
-			<th>Pending</th>
-			<th>In Progress</th>
-			<th>Resolved</th>
-			<th>Rejected</th>
-		</tr>
-		<tr>
-			<td><?php echo $total; ?></td>
-			<td><?php echo $pending; ?></td>
-			<td><?php echo $progress; ?></td>
-			<td><?php echo $resolved; ?></td>
-			<td><?php echo $rejected; ?></td>
-		</tr>
-	</table>
+	<div class="container-fluid p-4">
+		<h1 class="mb-2">Government Monitoring System</h1>
+		<hr>
+		<h2 class="mb-4">Dashboard</h2>
+		<div class="row">
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-primary">
+					<div class="card-body">
+						<h6 class="text-white">Total Complaints</h6>
+						<h2 class="text-white"><?php echo $total; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-warning h-100">
+					<div class="card-body">
+						<h6>Pending</h6>
+						<h2><?php echo $pending; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-info h-100">
+					<div class="card-body">
+						<h6>In Progress</h6>
+						<h2><?php echo $progress; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-success h-100">
+					<div class="card-body">
+						<h6 class="text-white">Resolved</h6>
+						<h2 class="text-white"><?php echo $resolved; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-danger h-100">
+					<div class="card-body">
+						<h6 class="text-white">Rejected</h6>
+						<h2 class="text-white"><?php echo $rejected; ?></h2>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<h3>Complaints by Department</h3>
 	<table border="1">
@@ -135,5 +169,8 @@ $latest = $prep->fetchAll();
 			</tr>
 		<?php endforeach; ?>
 	</table>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js" integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu" crossorigin="anonymous"></script>
 </body>
+
 </html>

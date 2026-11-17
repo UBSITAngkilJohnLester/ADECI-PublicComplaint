@@ -45,6 +45,18 @@ $prep = $pdo->prepare("SELECT complaints.*, accounts.username
 	ORDER BY complaints.ID DESC LIMIT 10");
 $prep->execute();
 $latest = $prep->fetchAll();
+
+// feedback: average scores
+$prep = $pdo->prepare("SELECT COUNT(*) AS total,
+		ROUND(AVG(satisfaction_rating), 1) AS overall,
+		ROUND(AVG(timeliness), 1) AS timeliness,
+		ROUND(AVG(professionalism), 1) AS professionalism,
+		ROUND(AVG(communication), 1) AS communication,
+		SUM(resolution_status = 'yes') AS resolved_yes,
+		SUM(resolution_status = 'no') AS resolved_no
+	FROM feedback");
+$prep->execute();
+$summary = $prep->fetch();
 ?>
 <!DOCTYPE html>
 <html>

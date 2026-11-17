@@ -13,6 +13,16 @@ $sql = "SELECT * FROM complaints WHERE acc_id = ? ORDER BY ID DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$_SESSION['ID']]);
 $complaints = $stmt->fetchAll();
+
+// Feedback
+$sql = "SELECT complaints.*, feedback.ID AS feedback_id
+	FROM complaints
+	LEFT JOIN feedback ON feedback.complaint_id = complaints.ID
+	WHERE complaints.acc_id = ?
+	ORDER BY complaints.ID DESC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$_SESSION['ID']]);
+$complaints = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,6 +59,7 @@ $complaints = $stmt->fetchAll();
 			<th>Date</th>
 			<th>Photo</th>
 			<th colspan="2">Actions</th>
+			<th colspan="2">FeedBack</th>
 		</tr>
 
 		<?php if (count($complaints) == 0){ ?>
@@ -86,6 +97,17 @@ $complaints = $stmt->fetchAll();
 				<td>
 					<a href="delete_complain.php?id=<?php echo $row['ID']; ?>"
 						onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
+				</td>
+				<td>
+					<?php if ($row['status'] == 'Pending' || $row['status'] == 'Rejected'): ?>
+						<?php if ($row['feedback_id']): ?>
+							Feedback sent
+							<?php else: ?>
+								<a href="user_feedback.php?id=<?php echo $row['ID']; ?>">Give Feedback</a>
+							<?php endif; ?>
+						<?php else: ?>
+						<span style="color:gray;">Please wait for the status of your complaint</span>
+					<?php endif; ?>
 				</td>
 			</tr>
 		<?php } ?>

@@ -29,13 +29,20 @@ if (isset($_POST['register'])) {
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title></title>
-</head>
-
-<body class="bg-secondary-subtle">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 
+</head>
+
+<style>
+	html {
+		scrollbar-gutter: stable;
+	}
+</style>
+
+<body class="bg-secondary-subtle">
+
 	<div class="container min-vh-100 d-flex justify-content-center align-items-center">
-		<div class="card show p-4" style="width: 100%; max-width: 500px;">
+		<div class="card show p-4" style="width: 100%; max-width: 450px;">
 			<h1 class="text-center mb-3">Government Monitoring System</h1>
 			<hr>
 			<h2 class="text-center mb-4">Register</h2>

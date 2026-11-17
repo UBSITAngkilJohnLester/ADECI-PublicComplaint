@@ -99,7 +99,7 @@ $complaints = $stmt->fetchAll();
 						onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
 				</td>
 				<td>
-					<?php if ($row['status'] == 'Pending' || $row['status'] == 'Rejected'): ?>
+					<?php if ($row['status'] == 'Resolved' || $row['status'] == 'Rejected'): ?>
 						<?php if ($row['feedback_id']): ?>
 							Feedback sent
 							<?php else: ?>

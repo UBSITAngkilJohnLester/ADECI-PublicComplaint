@@ -144,6 +144,29 @@ $summary = $prep->fetch();
 		<?php endforeach; ?>
 	</table>
 
+	<h3>Citizen Feedback</h3>
+	<p><a href="admin_feedback.php"><button type="button">Check Feedback</button></a></p>
+	<table border="1">
+		<tr>
+			<th>Total Feedback</th>
+			<th>Overall (out of 5)</th>
+			<th>Timeliness</th>
+			<th>Professionalism</th>
+			<th>Communication</th>
+			<th>Resolved: Yes</th>
+			<th>Resolved: No</th>
+		</tr>
+		<tr>
+			<td><?php echo $summary['total']; ?></td>
+			<td><?php echo $summary['overall'] ?? '-'; ?></td>
+			<td><?php echo $summary['timeliness'] ?? '-'; ?></td>
+			<td><?php echo $summary['professionalism'] ?? '-'; ?></td>
+			<td><?php echo $summary['communication'] ?? '-'; ?></td>
+			<td><?php echo $summary['resolved_yes'] ?? 0; ?></td>
+			<td><?php echo $summary['resolved_no'] ?? 0; ?></td>
+		</tr>
+	</table>
+
 	<h3>Latest Complaints</h3>
 	<p><a href="manage_complaints.php"><button type="button">Manage Complaints</button></a></p>
 	<table border="1">

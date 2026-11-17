@@ -9,11 +9,11 @@ if (!isset($_SESSION['ID'])) {
 }
 
 // The complaint ID comes from the link: user_feedback.php?id=5
-if (!isset($_GET['id'])) {
+if (!isset($_SESSION['id'])) {
 	header("location:index.php");
 	exit();
 }
-$complaintId = $_GET['id'];
+$complaintId = $_SESSION['id'];
 
 // The complaint must belong to the logged-in user.
 $select = $pdo->prepare("SELECT ID, reference_no, category FROM complaints WHERE ID = ? AND acc_id = ?");

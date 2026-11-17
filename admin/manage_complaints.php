@@ -7,14 +7,14 @@ if (!isset($_SESSION['ID'])) {
 	exit();
 }
 
-// which department did the admin pick? (empty = none yet)
+
 $department = "";
 if (isset($_GET['department'])) {
 	$department = $_GET['department'];
 }
 
 if ($department == "") {
-	// step 1: list of departments + all complaints (for the counts)
+	
 	$prep = $pdo->prepare("SELECT DISTINCT department FROM categories");
 	$prep->execute();
 	$departments = $prep->fetchAll();
@@ -23,7 +23,7 @@ if ($department == "") {
 	$prep->execute();
 	$all = $prep->fetchAll();
 } else {
-	// step 2: complaints of the picked department, Pending first, oldest first
+	
 	$prep = $pdo->prepare("SELECT complaints.*, accounts.username
 		FROM complaints
 		JOIN accounts ON complaints.acc_id = accounts.ID
@@ -45,6 +45,7 @@ if ($department == "") {
 	<nav>
 		<a href="index.php">Dashboard</a>
 		<a href="manage_complaints.php">Manage Complaints</a>
+		<a href="admin_announcement.php">Announcement</a>
 		<a href="logout.php">Logout</a>
 	</nav>
 	<hr>
@@ -130,7 +131,7 @@ if ($department == "") {
 							<button type="submit">Manage</button>
 						</form>
 
-						<!-- <a href="manage_complaint.php?id=<?php echo $c['ID']; ?>">Manage</a>-->
+						<?php echo $c['ID']; ?>
 					</td>
 				</tr>
 			<?php endforeach; ?>

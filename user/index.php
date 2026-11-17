@@ -1,28 +1,34 @@
 <?php
-session_start();
-require_once "../dbconn.php";
+	session_start();
+	require_once "../dbconn.php";
 
-// Make sures the user is logged in.
-if (!isset($_SESSION['ID'])) {
-	header("location:../index.php");
-	exit();
-}
+	//check account status
+	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+	$prep->execute([$_SESSION['ID']]);
+	$account = $prep->fetch();
 
-// Show the user's complains, newest first.
-$sql = "SELECT * FROM complaints WHERE acc_id = ? ORDER BY ID DESC";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$_SESSION['ID']]);
-$complaints = $stmt->fetchAll();
+	if (!isset($_SESSION['ID']) || $account['status'] != 'user') {
+		session_destroy();
+		header("location:../index.php");
+		exit();
+	}
 
-// Feedback
-$sql = "SELECT complaints.*, feedback.ID AS feedback_id
-	FROM complaints
-	LEFT JOIN feedback ON feedback.complaint_id = complaints.ID
-	WHERE complaints.acc_id = ?
-	ORDER BY complaints.ID DESC";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$_SESSION['ID']]);
-$complaints = $stmt->fetchAll();
+
+	// Show the user's complains, newest first.
+	$sql = "SELECT * FROM complaints WHERE acc_id = ? ORDER BY ID DESC";
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute([$_SESSION['ID']]);
+	$complaints = $stmt->fetchAll();
+
+	// Feedback
+	$sql = "SELECT complaints.*, feedback.ID AS feedback_id
+		FROM complaints
+		LEFT JOIN feedback ON feedback.complaint_id = complaints.ID
+		WHERE complaints.acc_id = ?
+		ORDER BY complaints.ID DESC";
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute([$_SESSION['ID']]);
+	$complaints = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html>

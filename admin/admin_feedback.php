@@ -2,17 +2,13 @@
 session_start();
 require_once "../dbconn.php";
 
-// Make sure the user is logged in.
-if (!isset($_SESSION['ID'])) {
-	header("location:../index.php");
-	exit();
-}
-
-// Make sure the logged-in account is an admin.
+//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
-if (!$account || $account['status'] != 'admin') {
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }

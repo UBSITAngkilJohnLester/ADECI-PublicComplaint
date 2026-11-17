@@ -2,7 +2,13 @@
 session_start();
 require_once "../dbconn.php";
 
-if (!isset($_SESSION['ID'])) {
+//check account status
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+$prep->execute([$_SESSION['ID']]);
+$account = $prep->fetch();
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }
@@ -207,5 +213,4 @@ $summary = $prep->fetch();
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js" integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu" crossorigin="anonymous"></script>
 </body>
-
 </html>

@@ -1,85 +1,90 @@
 <?php
-session_start();
-require_once "../dbconn.php";
+	session_start();
+	require_once "../dbconn.php";
 
-// Make sure the user is logged in.
-if (!isset($_SESSION['ID'])) {
-	header("location../index.php");
-	exit();
-}
+	//check account status
+	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+	$prep->execute([$_SESSION['ID']]);
+	$account = $prep->fetch();
 
-// Save the clicked complaint ID in the session, then clean the URL.
-if (isset($_POST['edit_id'])) {
-	$_SESSION['edit_id'] = $_POST['edit_id'];
-	header("location:edit_complain.php");
-	exit();
-}
-
-// Get the complaint ID from the URL.
-if (!isset($_SESSION['edit_id'])) {
-	header("location:index.php");
-	exit();
-}
-$id = $_SESSION['edit_id'];
-
-// Load the current complaint (only if it belongs to the user).
-$select = $pdo->prepare("SELECT * FROM complaints WHERE ID = ? AND acc_id = ?");
-$select->execute([$id, $_SESSION['ID']]);
-$row = $select->fetch();
-
-// Only Pending complaints can be edited.
-if (!$row || $row ['status'] != 'Pending') {
-	header("location:index.php");
-	exit(); 
-}
-
-$error = "";
-
-// Save changes when the form is submitted.
-if (isset($_POST['update'])) {
-	$description = $_POST['description'];
-	$street = $_POST['street'];
-	$barangay = $_POST['barangay'];
-	$landmark = $_POST['landmark'];
-
-	// Keep the old photo unless a new one is uploaded.
-	$photo_path = $row['photo_path'];
-
-	if ($_FILES['photo']['name'] != '') {
-		$ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
-
-		if ($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png') {
-			$new_path = "uploads/complaint_" . uniqid() . "." . $ext;
-			move_uploaded_file($_FILES['photo']['tmp_name'], $new_path);
-			$photo_path = $new_path;
-		} else {
-			$error = "Only JPG and PNG photos are allowed.";
-		}
+	if (!isset($_SESSION['ID']) || $account['status'] != 'user') {
+		session_destroy();
+		header("location:../index.php");
+		exit();
 	}
 
-	if ($error == "") {
-		$update = $pdo->prepare("UPDATE complaints SET
-			description = :description,
-			street = :street,
-			barangay = :barangay,
-			landmark = :landmark,
-			photo_path = :photo_path
-			WHERE ID = :id AND acc_id = :acc_id");
+	// Save the clicked complaint ID in the session, then clean the URL.
+	if (isset($_POST['edit_id'])) {
+		$_SESSION['edit_id'] = $_POST['edit_id'];
+		header("location:edit_complain.php");
+		exit();
+	}
 
-	$update->execute([
-		':description' => $description,
-		':street' => $street,
-		':barangay' => $barangay,
-		':landmark' => $landmark,
-		':photo_path' => $photo_path,
-		':id' => $id,
-		':acc_id' => $_SESSION['ID']
-	]);
-		unset($_SESSION['edit_id']);
+	// Get the complaint ID from the URL.
+	if (!isset($_SESSION['edit_id'])) {
 		header("location:index.php");
 		exit();
 	}
-}
+	$id = $_SESSION['edit_id'];
+
+	// Load the current complaint (only if it belongs to the user).
+	$select = $pdo->prepare("SELECT * FROM complaints WHERE ID = ? AND acc_id = ?");
+	$select->execute([$id, $_SESSION['ID']]);
+	$row = $select->fetch();
+
+	// Only Pending complaints can be edited.
+	if (!$row || $row ['status'] != 'Pending') {
+		header("location:index.php");
+		exit(); 
+	}
+
+	$error = "";
+
+	// Save changes when the form is submitted.
+	if (isset($_POST['update'])) {
+		$description = $_POST['description'];
+		$street = $_POST['street'];
+		$barangay = $_POST['barangay'];
+		$landmark = $_POST['landmark'];
+
+		// Keep the old photo unless a new one is uploaded.
+		$photo_path = $row['photo_path'];
+
+		if ($_FILES['photo']['name'] != '') {
+			$ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+			if ($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png') {
+				$new_path = "uploads/complaint_" . uniqid() . "." . $ext;
+				move_uploaded_file($_FILES['photo']['tmp_name'], $new_path);
+				$photo_path = $new_path;
+			} else {
+				$error = "Only JPG and PNG photos are allowed.";
+			}
+		}
+
+		if ($error == "") {
+			$update = $pdo->prepare("UPDATE complaints SET
+				description = :description,
+				street = :street,
+				barangay = :barangay,
+				landmark = :landmark,
+				photo_path = :photo_path
+				WHERE ID = :id AND acc_id = :acc_id");
+
+		$update->execute([
+			':description' => $description,
+			':street' => $street,
+			':barangay' => $barangay,
+			':landmark' => $landmark,
+			':photo_path' => $photo_path,
+			':id' => $id,
+			':acc_id' => $_SESSION['ID']
+		]);
+			unset($_SESSION['edit_id']);
+			header("location:index.php");
+			exit();
+		}
+	}
 ?>	
 <!DOCTYPE html>
 <html>

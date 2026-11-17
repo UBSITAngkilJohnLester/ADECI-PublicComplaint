@@ -80,7 +80,12 @@ $complaints = $stmt->fetchAll();
 				</td>
 				<td>
 					<?php if ($row['status'] == 'Pending'): ?>
-						<a href="edit_complain.php?id=<?php echo $row['ID']; ?>">Edit</a>
+						<form method="post" action="edit_complain.php"> 
+							<input type="hidden" name="edit_id" value="<?php echo $row['ID']; ?>">
+							<button type="submit">Edit</button>
+						</form>
+					<?php else: ?>
+							<button type="button" disabled>Edit</button>
 					<?php endif; ?>
 				</td>
 				<td>

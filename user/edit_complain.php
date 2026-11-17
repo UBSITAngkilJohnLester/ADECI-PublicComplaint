@@ -4,16 +4,23 @@ require_once "../dbconn.php";
 
 // Make sure the user is logged in.
 if (!isset($_SESSION['ID'])) {
-	header("location:../index.php");
+	header("location../index.php");
+	exit();
+}
+
+// Save the clicked complaint ID in the session, then clean the URL.
+if (isset($_POST['edit_id'])) {
+	$_SESSION['edit_id'] = $_POST['edit_id'];
+	header("location:edit_complain.php");
 	exit();
 }
 
 // Get the complaint ID from the URL.
-if (!isset($_GET['id'])) {
+if (!isset($_SESSION['edit_id'])) {
 	header("location:index.php");
 	exit();
 }
-$id = $_GET['id'];
+$id = $_SESSION['edit_id'];
 
 // Load the current complaint (only if it belongs to the user).
 $select = $pdo->prepare("SELECT * FROM complaints WHERE ID = ? AND acc_id = ?");
@@ -21,9 +28,9 @@ $select->execute([$id, $_SESSION['ID']]);
 $row = $select->fetch();
 
 // Only Pending complaints can be edited.
-if (!$row) {
+if (!$row || $row ['status'] != 'Pending') {
 	header("location:index.php");
-	exit();
+	exit(); 
 }
 
 $error = "";
@@ -42,7 +49,7 @@ if (isset($_POST['update'])) {
 		$ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
 
 		if ($ext == 'jpg' || $ext == 'jpeg' || $ext == 'png') {
-			$new_path = "uploads/" . time() . "_" . basename($_FILES['photo']['name']);
+			$new_path = "uploads/complaint_" . uniqid() . "." . $ext;
 			move_uploaded_file($_FILES['photo']['tmp_name'], $new_path);
 			$photo_path = $new_path;
 		} else {
@@ -68,7 +75,7 @@ if (isset($_POST['update'])) {
 		':id' => $id,
 		':acc_id' => $_SESSION['ID']
 	]);
-
+		unset($_SESSION['edit_id']);
 		header("location:index.php");
 		exit();
 	}

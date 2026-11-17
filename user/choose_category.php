@@ -1,12 +1,19 @@
 <?php
+	session_start();
 	require_once "../dbconn.php";
+
+	if (!isset($_SESSION['ID'])) {
+		header("location:../index.php");
+		exit();
+	}
 
 	$search = "";
 	if (isset($_GET['search'])) {
 		$search = trim($_GET['search']);
 	}
 
-	$sql = "SELECT * FROM categories WHERE category LIKE ?";
+	// "Other Concern" is left out of the list, it has its own link at the bottom
+	$sql = "SELECT * FROM categories WHERE category LIKE ? AND category != 'Other Concern'";
 	$prep = $pdo->prepare($sql);
 	$prep->execute(["%" . $search . "%"]);
 	$rows = $prep->fetchAll();
@@ -30,11 +37,18 @@
 		<tr>
 			<th>Category</th>
 		</tr>
+
+		<?php if (count($rows) == 0): ?>
+			<tr>
+				<td>No category found. Try another word, or pick "Other Concern" below.</td>
+			</tr>
+		<?php endif; ?>
+
 		<?php foreach ($rows as $row): ?>
 			<tr>
 				<td>
 					<a href="insert_complain.php?category=<?php echo urlencode($row['category']); ?>">
-						<?php echo $row['category']; ?>
+						<?php echo htmlspecialchars($row['category']); ?>
 					</a>
 				</td>
 			</tr>

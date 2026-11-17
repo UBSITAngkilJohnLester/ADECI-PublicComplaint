@@ -124,7 +124,14 @@ if ($department == "") {
 							No photo
 						<?php endif; ?>
 					</td>
-					<td><a href="manage_complaint.php?id=<?php echo $c['ID']; ?>">Manage</a></td>
+					<td>
+						<form method="post" action="manage_edit_complaints.php">
+							<input type="hidden" name="manage_id" value="<?php echo $c['ID']; ?>">
+							<button type="submit">Manage</button>
+						</form>
+
+						<!-- <a href="manage_complaint.php?id=<?php echo $c['ID']; ?>">Manage</a>-->
+					</td>
 				</tr>
 			<?php endforeach; ?>
 		</table>

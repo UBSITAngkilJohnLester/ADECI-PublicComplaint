@@ -29,8 +29,8 @@ $summary = $prep->fetch();
 $prep = $pdo->prepare("SELECT feedback.*, complaints.reference_no, complaints.department,
 		complaints.category, accounts.username
 	FROM feedback
-	JOIN complaints ON feedback.complaint_id = complaints.ID
-	JOIN accounts ON feedback.acc_id = accounts.ID
+	LEFT JOIN complaints ON feedback.complaint_id = complaints.ID
+	LEFT JOIN accounts ON feedback.acc_id = accounts.ID
 	ORDER BY feedback.ID DESC");
 $prep->execute();
 $feedbacks = $prep->fetchAll();

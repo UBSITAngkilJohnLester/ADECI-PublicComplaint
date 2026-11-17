@@ -1,68 +1,68 @@
 <?php
-session_start();
-require_once "../dbconn.php";
+	session_start();
+	require_once "../dbconn.php";
 
-//check account status
-$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
-$prep->execute([$_SESSION['ID']]);
-$account = $prep->fetch();
+	//check account status
+	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+	$prep->execute([$_SESSION['ID']]);
+	$account = $prep->fetch();
 
-if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
-	session_destroy();
-	header("location:../index.php");
-	exit();
-}
-
-// all complaints (for the counters)
-$prep = $pdo->prepare("SELECT * FROM complaints");
-$prep->execute();
-$row = $prep->fetchAll();
-
-$total = count($row);
-$pending = 0;
-$progress = 0;
-$resolved = 0;
-$rejected = 0;
-
-foreach ($row as $r) {
-	if ($r['status'] == "Pending") {
-		$pending++;
+	if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+		session_destroy();
+		header("location:../index.php");
+		exit();
 	}
-	if ($r['status'] == "In Progress") {
-		$progress++;
-	}
-	if ($r['status'] == "Resolved") {
-		$resolved++;
-	}
-	if ($r['status'] == "Rejected") {
-		$rejected++;
-	}
-}
 
-// complaints per department
-$prep = $pdo->prepare("SELECT department, COUNT(*) AS total FROM complaints GROUP BY department ORDER BY total DESC");
-$prep->execute();
-$departments = $prep->fetchAll();
+	// all complaints (for the counters)
+	$prep = $pdo->prepare("SELECT * FROM complaints");
+	$prep->execute();
+	$row = $prep->fetchAll();
 
-// latest 10 complaints
-$prep = $pdo->prepare("SELECT complaints.*, accounts.username
-	FROM complaints
-	JOIN accounts ON complaints.acc_id = accounts.ID
-	ORDER BY complaints.ID DESC LIMIT 10");
-$prep->execute();
-$latest = $prep->fetchAll();
+	$total = count($row);
+	$pending = 0;
+	$progress = 0;
+	$resolved = 0;
+	$rejected = 0;
 
-// feedback: average scores
-$prep = $pdo->prepare("SELECT COUNT(*) AS total,
-		ROUND(AVG(satisfaction_rating), 1) AS overall,
-		ROUND(AVG(timeliness), 1) AS timeliness,
-		ROUND(AVG(professionalism), 1) AS professionalism,
-		ROUND(AVG(communication), 1) AS communication,
-		SUM(resolution_status = 'yes') AS resolved_yes,
-		SUM(resolution_status = 'no') AS resolved_no
-	FROM feedback");
-$prep->execute();
-$summary = $prep->fetch();
+	foreach ($row as $r) {
+		if ($r['status'] == "Pending") {
+			$pending++;
+		}
+		if ($r['status'] == "In Progress") {
+			$progress++;
+		}
+		if ($r['status'] == "Resolved") {
+			$resolved++;
+		}
+		if ($r['status'] == "Rejected") {
+			$rejected++;
+		}
+	}
+
+	// complaints per department
+	$prep = $pdo->prepare("SELECT department, COUNT(*) AS total FROM complaints GROUP BY department ORDER BY total DESC");
+	$prep->execute();
+	$departments = $prep->fetchAll();
+
+	// latest 10 complaints
+	$prep = $pdo->prepare("SELECT complaints.*, accounts.username
+		FROM complaints
+		JOIN accounts ON complaints.acc_id = accounts.ID
+		ORDER BY complaints.ID DESC LIMIT 10");
+	$prep->execute();
+	$latest = $prep->fetchAll();
+
+	// feedback: average scores
+	$prep = $pdo->prepare("SELECT COUNT(*) AS total,
+			ROUND(AVG(satisfaction_rating), 1) AS overall,
+			ROUND(AVG(timeliness), 1) AS timeliness,
+			ROUND(AVG(professionalism), 1) AS professionalism,
+			ROUND(AVG(communication), 1) AS communication,
+			SUM(resolution_status = 'yes') AS resolved_yes,
+			SUM(resolution_status = 'no') AS resolved_no
+		FROM feedback");
+	$prep->execute();
+	$summary = $prep->fetch();
 ?>
 <!DOCTYPE html>
 <html>
@@ -132,7 +132,7 @@ $summary = $prep->fetch();
 	</div>
 
 	<h3>Complaints by Department</h3>
-	<table border="1">
+	<table class="table table-striped">
 		<tr>
 			<th>Department</th>
 			<th>Complaints</th>

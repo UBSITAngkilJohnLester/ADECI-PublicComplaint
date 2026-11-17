@@ -45,6 +45,18 @@ $prep = $pdo->prepare("SELECT complaints.*, accounts.username
 	ORDER BY complaints.ID DESC LIMIT 10");
 $prep->execute();
 $latest = $prep->fetchAll();
+
+// feedback: average scores
+$prep = $pdo->prepare("SELECT COUNT(*) AS total,
+		ROUND(AVG(satisfaction_rating), 1) AS overall,
+		ROUND(AVG(timeliness), 1) AS timeliness,
+		ROUND(AVG(professionalism), 1) AS professionalism,
+		ROUND(AVG(communication), 1) AS communication,
+		SUM(resolution_status = 'yes') AS resolved_yes,
+		SUM(resolution_status = 'no') AS resolved_no
+	FROM feedback");
+$prep->execute();
+$summary = $prep->fetch();
 ?>
 <!DOCTYPE html>
 <html>
@@ -130,6 +142,29 @@ $latest = $prep->fetchAll();
 				<td><?php echo $d['total']; ?></td>
 			</tr>
 		<?php endforeach; ?>
+	</table>
+
+	<h3>Citizen Feedback</h3>
+	<p><a href="admin_feedback.php"><button type="button">Check Feedback</button></a></p>
+	<table border="1">
+		<tr>
+			<th>Total Feedback</th>
+			<th>Overall (out of 5)</th>
+			<th>Timeliness</th>
+			<th>Professionalism</th>
+			<th>Communication</th>
+			<th>Resolved: Yes</th>
+			<th>Resolved: No</th>
+		</tr>
+		<tr>
+			<td><?php echo $summary['total']; ?></td>
+			<td><?php echo $summary['overall'] ?? '-'; ?></td>
+			<td><?php echo $summary['timeliness'] ?? '-'; ?></td>
+			<td><?php echo $summary['professionalism'] ?? '-'; ?></td>
+			<td><?php echo $summary['communication'] ?? '-'; ?></td>
+			<td><?php echo $summary['resolved_yes'] ?? 0; ?></td>
+			<td><?php echo $summary['resolved_no'] ?? 0; ?></td>
+		</tr>
 	</table>
 
 	<h3>Latest Complaints</h3>

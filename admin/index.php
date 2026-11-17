@@ -2,7 +2,13 @@
 session_start();
 require_once "../dbconn.php";
 
-if (!isset($_SESSION['ID'])) {
+//check account status
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+$prep->execute([$_SESSION['ID']]);
+$account = $prep->fetch();
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }
@@ -40,21 +46,21 @@ $departments = $prep->fetchAll();
 
 // latest 10 complaints
 $prep = $pdo->prepare("SELECT complaints.*, accounts.username
-	FROM complaints
-	JOIN accounts ON complaints.acc_id = accounts.ID
-	ORDER BY complaints.ID DESC LIMIT 10");
+		FROM complaints
+		JOIN accounts ON complaints.acc_id = accounts.ID
+		ORDER BY complaints.ID DESC LIMIT 10");
 $prep->execute();
 $latest = $prep->fetchAll();
 
 // feedback: average scores
 $prep = $pdo->prepare("SELECT COUNT(*) AS total,
-		ROUND(AVG(satisfaction_rating), 1) AS overall,
-		ROUND(AVG(timeliness), 1) AS timeliness,
-		ROUND(AVG(professionalism), 1) AS professionalism,
-		ROUND(AVG(communication), 1) AS communication,
-		SUM(resolution_status = 'yes') AS resolved_yes,
-		SUM(resolution_status = 'no') AS resolved_no
-	FROM feedback");
+			ROUND(AVG(satisfaction_rating), 1) AS overall,
+			ROUND(AVG(timeliness), 1) AS timeliness,
+			ROUND(AVG(professionalism), 1) AS professionalism,
+			ROUND(AVG(communication), 1) AS communication,
+			SUM(resolution_status = 'yes') AS resolved_yes,
+			SUM(resolution_status = 'no') AS resolved_no
+		FROM feedback");
 $prep->execute();
 $summary = $prep->fetch();
 ?>
@@ -73,7 +79,12 @@ $summary = $prep->fetch();
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
 			<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
+<<<<<<< HEAD
 			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
+=======
+			<a href="#" class="nav-item nav-link">Announcement</a>
+			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
+>>>>>>> ba4e8248e83db7cbc6acb7efa2b4b416df90a7a4
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
@@ -81,7 +92,7 @@ $summary = $prep->fetch();
 		<h1 class="mb-2">Government Monitoring System</h1>
 		<hr>
 		<h2 class="mb-4">Dashboard</h2>
-		<div class="row">
+		<div class="row mb-2">
 			<div class="col">
 				<div class="card shadow-sm rounded p-3 bg-primary">
 					<div class="card-body">
@@ -123,26 +134,31 @@ $summary = $prep->fetch();
 				</div>
 			</div>
 		</div>
+
+		<h3 class="mb-4">Complaints by Department</h3>
+		<div class="col-md-6 ms-3">
+			<table class="table table-striped table-hover table-bordered text-center">
+				<tr>
+					<th>Department</th>
+					<th>Complaints</th>
+				</tr>
+				<?php if (count($departments) == 0): ?>
+					<tr>
+						<td colspan="2">No complaints yet.</td>
+					</tr>
+				<?php endif; ?>
+				<?php foreach ($departments as $d): ?>
+					<tr>
+						<td><?php echo $d['department']; ?></td>
+						<td><?php echo $d['total']; ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</table>
+		</div>
 	</div>
 
-	<h3>Complaints by Department</h3>
-	<table border="1">
-		<tr>
-			<th>Department</th>
-			<th>Complaints</th>
-		</tr>
-		<?php if (count($departments) == 0): ?>
-			<tr>
-				<td colspan="2">No complaints yet.</td>
-			</tr>
-		<?php endif; ?>
-		<?php foreach ($departments as $d): ?>
-			<tr>
-				<td><?php echo $d['department']; ?></td>
-				<td><?php echo $d['total']; ?></td>
-			</tr>
-		<?php endforeach; ?>
-	</table>
+
+
 
 	<h3>Citizen Feedback</h3>
 	<p><a href="admin_feedback.php"><button type="button">Check Feedback</button></a></p>

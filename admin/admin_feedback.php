@@ -2,6 +2,7 @@
 session_start();
 require_once "../dbconn.php";
 
+<<<<<<< HEAD
 
 if (!isset($_SESSION['ID'])) {
 	header("location:../index.php");
@@ -9,10 +10,15 @@ if (!isset($_SESSION['ID'])) {
 }
 
 
+=======
+//check account status
+>>>>>>> ba4e8248e83db7cbc6acb7efa2b4b416df90a7a4
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
-if (!$account || $account['status'] != 'admin') {
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }
@@ -33,8 +39,8 @@ $summary = $prep->fetch();
 $prep = $pdo->prepare("SELECT feedback.*, complaints.reference_no, complaints.department,
 		complaints.category, accounts.username
 	FROM feedback
-	JOIN complaints ON feedback.complaint_id = complaints.ID
-	JOIN accounts ON feedback.acc_id = accounts.ID
+	LEFT JOIN complaints ON feedback.complaint_id = complaints.ID
+	LEFT JOIN accounts ON feedback.acc_id = accounts.ID
 	ORDER BY feedback.ID DESC");
 $prep->execute();
 $feedbacks = $prep->fetchAll();

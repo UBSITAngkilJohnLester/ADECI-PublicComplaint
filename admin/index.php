@@ -79,12 +79,8 @@ $summary = $prep->fetch();
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
 			<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
-<<<<<<< HEAD
-			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
-=======
-			<a href="#" class="nav-item nav-link">Announcement</a>
 			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
->>>>>>> ba4e8248e83db7cbc6acb7efa2b4b416df90a7a4
+			<a href="#" class="nav-item nav-link">Announcement</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>

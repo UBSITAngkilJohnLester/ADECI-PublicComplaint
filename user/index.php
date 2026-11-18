@@ -29,6 +29,33 @@ $sql = "SELECT complaints.*, feedback.ID AS feedback_id
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$_SESSION['ID']]);
 $complaints = $stmt->fetchAll();
+
+// Counters for this user's own complaints only.
+$total = count($complaints);
+$pending = 0;
+$progress = 0;
+$resolved = 0;
+$rejected = 0;
+
+foreach ($complaints as $c) {
+	if ($c['status'] == "Pending") {
+		$pending++;
+	}
+	if ($c['status'] == "In Progress") {
+		$progress++;
+	}
+	if ($c['status'] == "Resolved") {
+		$resolved++;
+	}
+	if ($c['status'] == "Rejected") {
+		$rejected++;
+	}
+}
+
+// Latest 3 announcements from the admin.
+$prep = $pdo->prepare("SELECT * FROM announcements ORDER BY ID DESC LIMIT 3");
+$prep->execute();
+$announcements = $prep->fetchAll();
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,13 +64,80 @@ $complaints = $stmt->fetchAll();
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Government Monitoring System</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 </head>
 
 <body>
 	<h1>Government Monitoring System (User)</h1>
 	<nav>
+		<a href="index.php">My Complaints</a> |
+		<a href="announcements.php">Announcements</a> |
 		<a href="logout.php">Logout</a>
 	</nav>
+	<hr>
+
+	<div class="container-fluid mb-3">
+		<h2 class="mb-3">My Dashboard</h2>
+		<div class="row">
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-primary h-100">
+					<div class="card-body">
+						<h6 class="text-white">Total Complaints</h6>
+						<h2 class="text-white"><?php echo $total; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-warning h-100">
+					<div class="card-body">
+						<h6>Pending</h6>
+						<h2><?php echo $pending; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-info h-100">
+					<div class="card-body">
+						<h6>In Progress</h6>
+						<h2><?php echo $progress; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-success h-100">
+					<div class="card-body">
+						<h6 class="text-white">Resolved</h6>
+						<h2 class="text-white"><?php echo $resolved; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-danger h-100">
+					<div class="card-body">
+						<h6 class="text-white">Rejected</h6>
+						<h2 class="text-white"><?php echo $rejected; ?></h2>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+
+	<h2>Public Announcement</h2>
+	<?php if (count($announcements) == 0): ?>
+		<p>No announcements yet.</p>
+	<?php endif; ?>
+	<?php foreach ($announcements as $a): ?>
+		<div style="border:1px solid #999; padding:10px; margin-bottom:10px;">
+			<strong><?php echo htmlspecialchars($a['category']); ?></strong>
+			<h3 style="margin:0;"><?php echo htmlspecialchars($a['title']); ?></h3>
+			<small><?php echo date("M d, Y h:i A", strtotime($a['date_posted'])); ?></small>
+			<p><?php echo nl2br(htmlspecialchars($a['message'])); ?></p>
+		</div>
+	<?php endforeach; ?>
+	<?php if (count($announcements) > 0): ?>
+		<p><a href="announcements.php">View all announcements</a></p>
+	<?php endif; ?>
 	<hr>
 
 	<h2>My Complaints</h2>

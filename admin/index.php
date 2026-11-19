@@ -80,7 +80,7 @@ $summary = $prep->fetch();
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
 			<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
 			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
-			<a href="#" class="nav-item nav-link">Announcement</a>
+			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
@@ -151,33 +151,35 @@ $summary = $prep->fetch();
 				<?php endforeach; ?>
 			</table>
 		</div>
+
+		<h3 class="mb-4">Citizen Feedback</h3>
+		<a href="admin_feedback.php" class="btn btn-primary mb-2">Check Feedback</a>
+		<div class="col-md-8">
+			<table class="table table-striped table-bordered">
+				<tr>
+					<th>Total Feedback</th>
+					<th>Overall (out of 5)</th>
+					<th>Timeliness</th>
+					<th>Professionalism</th>
+					<th>Communication</th>
+					<th>Resolved: Yes</th>
+					<th>Resolved: No</th>
+				</tr>
+				<tr>
+					<td><?php echo $summary['total']; ?></td>
+					<td><?php echo $summary['overall'] ?? '-'; ?></td>
+					<td><?php echo $summary['timeliness'] ?? '-'; ?></td>
+					<td><?php echo $summary['professionalism'] ?? '-'; ?></td>
+					<td><?php echo $summary['communication'] ?? '-'; ?></td>
+					<td><?php echo $summary['resolved_yes'] ?? 0; ?></td>
+					<td><?php echo $summary['resolved_no'] ?? 0; ?></td>
+				</tr>
+			</table>
+		</div>
 	</div>
 
 
 
-
-	<h3>Citizen Feedback</h3>
-	<p><a href="admin_feedback.php"><button type="button">Check Feedback</button></a></p>
-	<table border="1">
-		<tr>
-			<th>Total Feedback</th>
-			<th>Overall (out of 5)</th>
-			<th>Timeliness</th>
-			<th>Professionalism</th>
-			<th>Communication</th>
-			<th>Resolved: Yes</th>
-			<th>Resolved: No</th>
-		</tr>
-		<tr>
-			<td><?php echo $summary['total']; ?></td>
-			<td><?php echo $summary['overall'] ?? '-'; ?></td>
-			<td><?php echo $summary['timeliness'] ?? '-'; ?></td>
-			<td><?php echo $summary['professionalism'] ?? '-'; ?></td>
-			<td><?php echo $summary['communication'] ?? '-'; ?></td>
-			<td><?php echo $summary['resolved_yes'] ?? 0; ?></td>
-			<td><?php echo $summary['resolved_no'] ?? 0; ?></td>
-		</tr>
-	</table>
 
 	<h3>Latest Complaints</h3>
 	<p><a href="manage_complaints.php"><button type="button">Manage Complaints</button></a></p>

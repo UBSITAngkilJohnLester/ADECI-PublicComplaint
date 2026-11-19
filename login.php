@@ -4,7 +4,7 @@
 
 	if (isset($_POST['login'])) {
 		$username = htmlspecialchars($_POST['username']);
-		$password = htmlspecialchars($_POST['password']);
+		$password = $_POST['password'];
 
 		$sql = "SELECT * FROM accounts WHERE username = ?";
 		$prep = $pdo->prepare($sql);
@@ -15,7 +15,7 @@
 			header("location:index.php");
 		}else{
 			foreach ($rows as $row) {
-				if ($password == $row['password'] && $row['status'] =="admin") {
+				if (password_verify($password, $row['password']) && $row['status'] =="admin") {
 					$_SESSION['USERNAME'] = $row['username'];
 					$_SESSION['FIRSTNAME'] = $row['firstname'];
 					$_SESSION['ID'] = $row['ID'];
@@ -24,7 +24,7 @@
 					exit();
 
 				}
-				else if ($password == $row['password'] && $row['status']== "user") {
+				else if (password_verify($password, $row['password']) && $row['status']== "user") {
 					$_SESSION['USERNAME'] = $row['username'];
 					$_SESSION['FIRSTNAME'] = $row['firstname'];
 					$_SESSION['ID'] = $row['ID'];

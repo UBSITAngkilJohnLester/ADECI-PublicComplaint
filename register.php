@@ -3,14 +3,23 @@ session_start();
 require_once "dbconn.php";
 
 $message = "";
+$wrongcontact = "";
+
+$usernameexist = false;
+$invalidcontact = false;
+
 $firstname = "";
 $lastname = "";
 $username = "";
+$address = "";
+$contact = "";
 
 if (isset($_POST['register'])) {
 	$firstname = htmlspecialchars($_POST['firstname']);
 	$lastname = htmlspecialchars($_POST['lastname']);
 	$username = htmlspecialchars($_POST['username']);
+	$address = htmlspecialchars($_POST['username']);
+	$contact = trim(htmlspecialchars($_POST['contact']));
 	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 	$status = "user";
 
@@ -20,15 +29,26 @@ if (isset($_POST['register'])) {
 	$rows = $prep->fetch();
 
 	if ($rows) {
+		$usernameexist = true;
 		$message = "Username already exists. Try a different one.";
 		$username = "";
-	} else {
-		$sql2 = "INSERT INTO accounts(firstname, lastname, username, password, status) VALUES(?,?,?,?,?)";
+	}
+	
+	if (!preg_match('/^[0-9]{11}$/', $contact)) {
+		$invalidcontact = true;
+		$wrongcontact = "Invalid contact number.";
+		$contact = "";
+	} 
+	
+	if(!$usernameexist && !$invalidcontact){
+		$sql2 = "INSERT INTO accounts(firstname, lastname, username, password,contact_number, address, status) VALUES(?,?,?,?,?,?,?)";
 		$prep2 = $pdo->prepare($sql2);
 		$prep2->execute([
 			$firstname,
 			$lastname,
 			$username,
+			$contact,
+			$address,
 			$password,
 			$status
 		]);
@@ -64,32 +84,52 @@ if (isset($_POST['register'])) {
 
 	<div class="container min-vh-100 d-flex justify-content-center align-items-center">
 		<div class="card show p-4" style="width: 100%; max-width: 450px;">
-			<?php if (!empty($message)) {?>
-				<div class="alert alert-<?php echo $message;?> alert-dismissible fade show alert-warning" role="alert">
+			<?php if (!empty($message)) { ?>
+				<div class="alert alert-<?php echo $message; ?> alert-dismissible fade show alert-warning" role="alert">
 					<?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?>
-					<button type="button" class="btn-close"  data-bs-dismiss="alert"></button>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 				</div>
-			<?php }?>
+			<?php }  
+			if(!empty($wrongcontact)){?>
+			<div class="alert alert-<?php echo $wrongcontact; ?> alert-dismissible fade show alert-warning" role="alert">
+				<?php echo htmlspecialchars($wrongcontact, ENT_QUOTES, 'UTF-8'); ?>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<?php } ?>
 			<h1 class="text-center mb-3">Government Monitoring System</h1>
 			<hr>
 			<h2 class="text-center mb-4">Register</h2>
 			<form method="post">
-				<div>
-					<div class="mb-3">
-						<label for="firstname" class="form-label">First Name</label>
-						<input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $firstname ?>" required>
+				<div class="row">
+					<div class="col">
+						<div class="mb-3">
+							<label for="firstname" class="form-label">First Name</label>
+							<input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $firstname ?>" placeholder="eg. Marie" required>
+						</div>
+					</div>
+					<div class="col">
+						<div class="mb-3">
+							<label for="lastname" class="form-label">Last Name</label>
+							<input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $lastname ?>" placeholder="e.g. Santos" required>
+						</div>
 					</div>
 				</div>
 				<div>
 					<div class="mb-3">
-						<label for="lastname" class="form-label">Last Name</label>
-						<input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $lastname ?>" required>
+						<label for="address" class="form-label">Address</label>
+						<input type="text" class="form-control" id="address" name="address" placeholder="e.g. Camp 7 Washingan" value="<?php echo $address ?>" required>
+					</div>
+				</div>
+				<div>
+					<div class="mb-3">
+						<label for="contact" class="form-label">Contact No.</label>
+						<input type="text" class="form-control" id="contact" name="contact" value="<?php echo $contact ?>" placeholder="e.g. 09776655520"  required>
 					</div>
 				</div>
 				<div>
 					<div class="mb-3">
 						<label for="username" class="form-label">Username</label>
-						<input type="text" class="form-control" id="username" name="username" value="<?php echo $username ?>" required>
+						<input type="text" class="form-control" id="username" name="username" value="<?php echo $username ?>" placeholder="e.g. marieS" required>
 					</div>
 				</div>
 				<div>

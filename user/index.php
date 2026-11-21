@@ -29,6 +29,7 @@ $complaints = $stmt->fetchAll();
 $total = count($complaints);
 $pending = 0;
 $progress = 0;
+$actiontaken = 0;
 $resolved = 0;
 $rejected = 0;
 
@@ -36,8 +37,11 @@ foreach ($complaints as $c) {
 	if ($c['status'] == "Pending") {
 		$pending++;
 	}
-	if ($c['status'] == "In Progress") {
+	if ($c['status'] == "Under Investigation") {
 		$progress++;
+	}
+	if ($c['status'] == "Action Taken") {
+		$actiontaken++;
 	}
 	if ($c['status'] == "Resolved") {
 		$resolved++;
@@ -98,8 +102,16 @@ $announcements = $prep->fetchAll();
 			<div class="col">
 				<div class="card shadow-sm rounded p-3 bg-info h-100">
 					<div class="card-body">
-						<h6>In Progress</h6>
+						<h6>Under Investigation</h6>
 						<h2><?php echo $progress; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-secondary h-100">
+					<div class="card-body">
+						<h6 class="text-white">Action Taken</h6>
+						<h2 class="text-white"><?php echo $actiontaken; ?></h2>
 					</div>
 				</div>
 			</div>
@@ -201,11 +213,15 @@ $announcements = $prep->fetchAll();
 					<?php endif; ?>
 				</td>
 				<td>
-					<a href="delete_complain.php?id=<?php echo $row['ID']; ?>"
-						onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
+					<?php if ($row['status'] == 'Pending'): ?>
+						<a href="delete_complain.php?id=<?php echo $row['ID']; ?>"
+							onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
+					<?php else: ?>
+						<button type="button" disabled>Delete</button>
+					<?php endif; ?>
 				</td>
 				<td>
-					<?php if ($row['status'] == 'Pending' || $row['status'] == 'In Progress') { ?>
+					<?php if ($row['status'] == 'Pending' || $row['status'] == 'Under Investigation' || $row['status'] == 'Action Taken') { ?>
 						<span style="color:gray;">Please wait for further updates</span>
 					<?php } else if ($row['feedback_id']) { ?>
 						Feedback sent
@@ -213,7 +229,7 @@ $announcements = $prep->fetchAll();
 						<a href="user_feedback.php?id=<?php echo $row['ID']; ?>">Give Feedback</a>
 					<?php } ?>
 					<?php ?>
-				</td>
+				</td>-
 			</tr>
 		<?php } ?>
 	</table>

@@ -7,6 +7,7 @@ if (!isset($_SESSION['ID'])) {
 	exit();
 }
 
+//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();

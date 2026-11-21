@@ -21,6 +21,7 @@ $row = $prep->fetchAll();
 $total = count($row);
 $pending = 0;
 $progress = 0;
+$actiontaken = 0;
 $resolved = 0;
 $rejected = 0;
 
@@ -28,14 +29,14 @@ foreach ($row as $r) {
 	if ($r['status'] == "Pending") {
 		$pending++;
 	}
-	if ($r['status'] == "In Progress") {
+	if ($r['status'] == "Under Investigation") {
 		$progress++;
+	}
+	if ($r['status'] == "Action Taken") {
+		$actiontaken++;
 	}
 	if ($r['status'] == "Resolved") {
 		$resolved++;
-	}
-	if ($r['status'] == "Rejected") {
-		$rejected++;
 	}
 }
 
@@ -108,8 +109,16 @@ $summary = $prep->fetch();
 			<div class="col">
 				<div class="card shadow-sm rounded p-3 bg-info h-100">
 					<div class="card-body">
-						<h6>In Progress</h6>
+						<h6>Under Investigation</h6>
 						<h2><?php echo $progress; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-secondary h-100">
+					<div class="card-body">
+						<h6 class="text-white">Action Taken</h6>
+						<h2 class="text-white"><?php echo $actiontaken; ?></h2>
 					</div>
 				</div>
 			</div>

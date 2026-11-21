@@ -19,7 +19,7 @@ if (isset($_POST['register'])) {
 	$lastname = htmlspecialchars($_POST['lastname']);
 	$username = htmlspecialchars($_POST['username']);
 	$address = htmlspecialchars($_POST['address']);
-	$contact = trim(htmlspecialchars($_POST['contact']));
+	$contact = htmlspecialchars($_POST['contact']);
 	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 	$status = "user";
 

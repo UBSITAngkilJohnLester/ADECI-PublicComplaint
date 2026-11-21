@@ -2,7 +2,13 @@
 session_start();
 require_once "../dbconn.php";
 
-if (!isset($_SESSION['ID'])) {
+//check account status
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+$prep->execute([$_SESSION['ID']]);
+$account = $prep->fetch();
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }
@@ -15,6 +21,7 @@ $row = $prep->fetchAll();
 $total = count($row);
 $pending = 0;
 $progress = 0;
+$actiontaken = 0;
 $resolved = 0;
 $rejected = 0;
 
@@ -22,14 +29,17 @@ foreach ($row as $r) {
 	if ($r['status'] == "Pending") {
 		$pending++;
 	}
-	if ($r['status'] == "In Progress") {
+	if ($r['status'] == "Under Investigation") {
 		$progress++;
+	}
+	if ($r['status'] == "Action Taken") {
+		$actiontaken++;
 	}
 	if ($r['status'] == "Resolved") {
 		$resolved++;
 	}
 	if ($r['status'] == "Rejected") {
-		$rejected++;
+	$rejected++;
 	}
 }
 
@@ -40,21 +50,21 @@ $departments = $prep->fetchAll();
 
 // latest 10 complaints
 $prep = $pdo->prepare("SELECT complaints.*, accounts.username
-	FROM complaints
-	JOIN accounts ON complaints.acc_id = accounts.ID
-	ORDER BY complaints.ID DESC LIMIT 10");
+		FROM complaints
+		JOIN accounts ON complaints.acc_id = accounts.ID
+		ORDER BY complaints.ID DESC LIMIT 10");
 $prep->execute();
 $latest = $prep->fetchAll();
 
 // feedback: average scores
 $prep = $pdo->prepare("SELECT COUNT(*) AS total,
-		ROUND(AVG(satisfaction_rating), 1) AS overall,
-		ROUND(AVG(timeliness), 1) AS timeliness,
-		ROUND(AVG(professionalism), 1) AS professionalism,
-		ROUND(AVG(communication), 1) AS communication,
-		SUM(resolution_status = 'yes') AS resolved_yes,
-		SUM(resolution_status = 'no') AS resolved_no
-	FROM feedback");
+			ROUND(AVG(satisfaction_rating), 1) AS overall,
+			ROUND(AVG(timeliness), 1) AS timeliness,
+			ROUND(AVG(professionalism), 1) AS professionalism,
+			ROUND(AVG(communication), 1) AS communication,
+			SUM(resolution_status = 'yes') AS resolved_yes,
+			SUM(resolution_status = 'no') AS resolved_no
+		FROM feedback");
 $prep->execute();
 $summary = $prep->fetch();
 ?>
@@ -73,7 +83,8 @@ $summary = $prep->fetch();
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
 			<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
-			<a href="#" class="nav-item nav-link">Announcement</a>
+			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
+			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
@@ -81,7 +92,7 @@ $summary = $prep->fetch();
 		<h1 class="mb-2">Government Monitoring System</h1>
 		<hr>
 		<h2 class="mb-4">Dashboard</h2>
-		<div class="row">
+		<div class="row mb-2">
 			<div class="col">
 				<div class="card shadow-sm rounded p-3 bg-primary">
 					<div class="card-body">
@@ -101,8 +112,16 @@ $summary = $prep->fetch();
 			<div class="col">
 				<div class="card shadow-sm rounded p-3 bg-info h-100">
 					<div class="card-body">
-						<h6>In Progress</h6>
+						<h6>Under Investigation</h6>
 						<h2><?php echo $progress; ?></h2>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card shadow-sm rounded p-3 bg-secondary h-100">
+					<div class="card-body">
+						<h6 class="text-white">Action Taken</h6>
+						<h2 class="text-white"><?php echo $actiontaken; ?></h2>
 					</div>
 				</div>
 			</div>
@@ -123,49 +142,56 @@ $summary = $prep->fetch();
 				</div>
 			</div>
 		</div>
+
+		<h3 class="mb-4">Complaints by Department</h3>
+		<div class="col-md-6 ms-3">
+			<table class="table table-striped table-hover table-bordered text-center">
+				<tr>
+					<th>Department</th>
+					<th>Complaints</th>
+				</tr>
+				<?php if (count($departments) == 0): ?>
+					<tr>
+						<td colspan="2">No complaints yet.</td>
+					</tr>
+				<?php endif; ?>
+				<?php foreach ($departments as $d): ?>
+					<tr>
+						<td><?php echo $d['department']; ?></td>
+						<td><?php echo $d['total']; ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</table>
+		</div>
+
+		<h3 class="mb-4">Citizen Feedback</h3>
+		<a href="admin_feedback.php" class="btn btn-primary mb-2">Check Feedback</a>
+		<div class="col-md-8">
+			<table class="table table-striped table-bordered">
+				<tr>
+					<th>Total Feedback</th>
+					<th>Overall (out of 5)</th>
+					<th>Timeliness</th>
+					<th>Professionalism</th>
+					<th>Communication</th>
+					<th>Resolved: Yes</th>
+					<th>Resolved: No</th>
+				</tr>
+				<tr>
+					<td><?php echo $summary['total']; ?></td>
+					<td><?php echo $summary['overall'] ?? '-'; ?></td>
+					<td><?php echo $summary['timeliness'] ?? '-'; ?></td>
+					<td><?php echo $summary['professionalism'] ?? '-'; ?></td>
+					<td><?php echo $summary['communication'] ?? '-'; ?></td>
+					<td><?php echo $summary['resolved_yes'] ?? 0; ?></td>
+					<td><?php echo $summary['resolved_no'] ?? 0; ?></td>
+				</tr>
+			</table>
+		</div>
 	</div>
 
-	<h3>Complaints by Department</h3>
-	<table border="1">
-		<tr>
-			<th>Department</th>
-			<th>Complaints</th>
-		</tr>
-		<?php if (count($departments) == 0): ?>
-			<tr>
-				<td colspan="2">No complaints yet.</td>
-			</tr>
-		<?php endif; ?>
-		<?php foreach ($departments as $d): ?>
-			<tr>
-				<td><?php echo $d['department']; ?></td>
-				<td><?php echo $d['total']; ?></td>
-			</tr>
-		<?php endforeach; ?>
-	</table>
 
-	<h3>Citizen Feedback</h3>
-	<p><a href="admin_feedback.php"><button type="button">Check Feedback</button></a></p>
-	<table border="1">
-		<tr>
-			<th>Total Feedback</th>
-			<th>Overall (out of 5)</th>
-			<th>Timeliness</th>
-			<th>Professionalism</th>
-			<th>Communication</th>
-			<th>Resolved: Yes</th>
-			<th>Resolved: No</th>
-		</tr>
-		<tr>
-			<td><?php echo $summary['total']; ?></td>
-			<td><?php echo $summary['overall'] ?? '-'; ?></td>
-			<td><?php echo $summary['timeliness'] ?? '-'; ?></td>
-			<td><?php echo $summary['professionalism'] ?? '-'; ?></td>
-			<td><?php echo $summary['communication'] ?? '-'; ?></td>
-			<td><?php echo $summary['resolved_yes'] ?? 0; ?></td>
-			<td><?php echo $summary['resolved_no'] ?? 0; ?></td>
-		</tr>
-	</table>
+
 
 	<h3>Latest Complaints</h3>
 	<p><a href="manage_complaints.php"><button type="button">Manage Complaints</button></a></p>

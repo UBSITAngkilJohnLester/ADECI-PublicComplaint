@@ -2,10 +2,17 @@
 session_start();
 require_once "../dbconn.php";
 
-if (!isset($_SESSION['ID'])) {
+//check account status
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+$prep->execute([$_SESSION['ID']]);
+$account = $prep->fetch();
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }
+
 
 // which department did the admin pick? (empty = none yet)
 $department = "";
@@ -28,7 +35,7 @@ if ($department == "") {
 		FROM complaints
 		JOIN accounts ON complaints.acc_id = accounts.ID
 		WHERE complaints.department = :department
-		ORDER BY FIELD(complaints.status, 'Pending', 'In Progress', 'Resolved', 'Rejected'), complaints.ID ASC");
+		ORDER BY FIELD(complaints.status, 'Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'), complaints.ID ASC");
 	$prep->execute([":department" => $department]);
 	$complaints = $prep->fetchAll();
 }
@@ -94,13 +101,15 @@ if ($department == "") {
 				<th>Description</th>
 				<th>Address</th>
 				<th>Status</th>
+				<th>Priority</th>
+				<th>Deadline</th>
 				<th>Date</th>
 				<th>Photo</th>
 				<th>Actions</th>
 			</tr>
 			<?php if (count($complaints) == 0): ?>
 				<tr>
-					<td colspan="9">No complaints for this department.</td>
+					<td colspan="11">No complaints for this department.</td>
 				</tr>
 			<?php endif; ?>
 			<?php foreach ($complaints as $c): ?>
@@ -116,6 +125,23 @@ if ($department == "") {
 						<?php endif; ?>
 					</td>
 					<td><?php echo $c['status']; ?></td>
+					<td>
+						<?php if ($c['priority'] == ''): ?>
+							Not set
+						<?php else: ?>
+							<?php echo htmlspecialchars($c['priority']); ?>
+						<?php endif; ?>
+					</td>
+					<td>
+						<?php if ($c['deadline'] == ''): ?>
+							Not set
+						<?php else: ?>
+							<?php echo date("M d, Y", strtotime($c['deadline'])); ?>
+							<?php if ($c['deadline'] < date("Y-m-d") && $c['status'] != 'Resolved' && $c['status'] != 'Rejected'): ?>
+								<br>(Overdue)
+							<?php endif; ?>
+						<?php endif; ?>
+					</td>
 					<td><?php echo date("M d, Y", strtotime($c['date_submitted'])); ?></td>
 					<td>
 						<?php if ($c['photo_path'] != ''): ?>
@@ -124,7 +150,14 @@ if ($department == "") {
 							No photo
 						<?php endif; ?>
 					</td>
-					<td><a href="manage_complaint.php?id=<?php echo $c['ID']; ?>">Manage</a></td>
+					<td>
+						<form method="post" action="manage_edit_complaints.php">
+							<input type="hidden" name="manage_id" value="<?php echo $c['ID']; ?>">
+							<button type="submit">Manage</button>
+						</form>
+
+						<!-- <a href="manage_complaint.php?id=<?php echo $c['ID']; ?>">Manage</a>-->
+					</td>
 				</tr>
 			<?php endforeach; ?>
 		</table>

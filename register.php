@@ -5,7 +5,7 @@ if (isset($_POST['register'])) {
 	$firstname = htmlspecialchars($_POST['firstname']);
 	$lastname = htmlspecialchars($_POST['lastname']);
 	$username = htmlspecialchars($_POST['username']);
-	$password = htmlspecialchars($_POST['password']);
+	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 	$status = "user";
 
 	$sql = "INSERT INTO accounts(firstname, lastname, username, password, status) VALUES(?,?,?,?,?)";

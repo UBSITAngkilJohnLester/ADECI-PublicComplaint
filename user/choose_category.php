@@ -2,7 +2,13 @@
 	session_start();
 	require_once "../dbconn.php";
 
-	if (!isset($_SESSION['ID'])) {
+	//check account status
+	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+	$prep->execute([$_SESSION['ID']]);
+	$account = $prep->fetch();
+
+	if (!isset($_SESSION['ID']) || $account['status'] != 'user') {
+		session_destroy();
 		header("location:../index.php");
 		exit();
 	}

@@ -2,22 +2,23 @@
 session_start();
 require_once "../dbconn.php";
 
-// Make sure the user is logged in.
 if (!isset($_SESSION['ID'])) {
 	header("location:../index.php");
 	exit();
 }
 
-// Make sure the logged-in account is an admin.
+//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
+
 if (!$account || $account['status'] != 'admin') {
+	session_destroy();
 	header("location:../index.php");
 	exit();
 }
 
-// Average scores across all feedback.
+
 $prep = $pdo->prepare("SELECT COUNT(*) AS total,
 		ROUND(AVG(satisfaction_rating), 1) AS overall,
 		ROUND(AVG(timeliness), 1) AS timeliness,
@@ -29,12 +30,12 @@ $prep = $pdo->prepare("SELECT COUNT(*) AS total,
 $prep->execute();
 $summary = $prep->fetch();
 
-// All feedback, newest first, with the complaint and the user who sent it.
+
 $prep = $pdo->prepare("SELECT feedback.*, complaints.reference_no, complaints.department,
 		complaints.category, accounts.username
 	FROM feedback
-	JOIN complaints ON feedback.complaint_id = complaints.ID
-	JOIN accounts ON feedback.acc_id = accounts.ID
+	LEFT JOIN complaints ON feedback.complaint_id = complaints.ID
+	LEFT JOIN accounts ON feedback.acc_id = accounts.ID
 	ORDER BY feedback.ID DESC");
 $prep->execute();
 $feedbacks = $prep->fetchAll();
@@ -52,6 +53,8 @@ $feedbacks = $prep->fetchAll();
 		<a href="index.php">Dashboard</a> |
 		<a href="manage_complaints.php">Manage Complaints</a> |
 		<a href="admin_feedback.php">Feedback</a> |
+		<a href="reports.php">Reports</a> |
+		<a href="admin_announcement.php">Announcement</a> |
 		<a href="logout.php">Logout</a>
 	</nav>
 	<hr>

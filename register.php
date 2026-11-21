@@ -18,7 +18,7 @@ if (isset($_POST['register'])) {
 	$firstname = htmlspecialchars($_POST['firstname']);
 	$lastname = htmlspecialchars($_POST['lastname']);
 	$username = htmlspecialchars($_POST['username']);
-	$address = htmlspecialchars($_POST['username']);
+	$address = htmlspecialchars($_POST['address']);
 	$contact = trim(htmlspecialchars($_POST['contact']));
 	$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 	$status = "user";
@@ -41,15 +41,15 @@ if (isset($_POST['register'])) {
 	} 
 	
 	if(!$usernameexist && !$invalidcontact){
-		$sql2 = "INSERT INTO accounts(firstname, lastname, username, password,contact_number, address, status) VALUES(?,?,?,?,?,?,?)";
+		$sql2 = "INSERT INTO accounts(firstname, lastname, username, password, contact_number, address, status) VALUES(?,?,?,?,?,?,?)";
 		$prep2 = $pdo->prepare($sql2);
 		$prep2->execute([
 			$firstname,
 			$lastname,
 			$username,
+			$password,	
 			$contact,
 			$address,
-			$password,
 			$status
 		]);
 

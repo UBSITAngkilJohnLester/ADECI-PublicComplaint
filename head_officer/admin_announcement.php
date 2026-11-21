@@ -12,7 +12,7 @@ if (!isset($_SESSION['ID'])) {
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
-if (!$account || $account['status'] != 'admin') {
+if (!$account || $account['status'] != 'head_officer') {
 	header("location:../index.php");
 	exit();
 }

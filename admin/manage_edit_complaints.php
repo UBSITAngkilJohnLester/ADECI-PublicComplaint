@@ -46,9 +46,15 @@ if (!$row) {
 
 $error = "";
 
-// Save the new status when the form is submitted.
-if (isset($_POST['update'])) {
+// Save when either the Update or the Mark as Resolved button is pressed.
+if (isset($_POST['update']) || isset($_POST['resolve'])) {
+
+	// The Resolved button sets the status by itself.
+	if (isset($_POST['resolve'])) {
+		$status = 'Resolved';
+	} else {
 		$status = $_POST['status'];
+	}
 	$priority = $_POST['priority'];
 
 	// Empty priority means "Not set".
@@ -65,9 +71,10 @@ if (isset($_POST['update'])) {
 	if ($deadline != null && strtotime($deadline) == false) {
 		$deadline = null;
 	}
+
 	// Only allow these statuses and priorities.
-		$statuses = ['Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'];
-		$priorities = ['Low', 'Medium', 'High'];
+	$statuses = ['Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'];
+	$priorities = ['Low', 'Medium', 'High'];
 
 	if (in_array($status, $statuses) && ($priority == null || in_array($priority, $priorities))) {
 
@@ -132,7 +139,7 @@ if (isset($_POST['update'])) {
 				<option value="Action Taken" <?php if ($row['status'] == 'Action Taken') echo 'selected'; ?>>Action Taken</option>
 				<option value="Resolved" <?php if ($row['status'] == 'Resolved') echo 'selected'; ?>>Resolved</option>
 				<option value="Rejected" <?php if ($row['status'] == 'Rejected') echo 'selected'; ?>>Rejected</option>
-				</select>
+			</select>
 		</p>
 		<p>
 			Priority:<br>
@@ -148,6 +155,9 @@ if (isset($_POST['update'])) {
 			<input type="date" name="deadline" value="<?php echo $row['deadline']; ?>">
 		</p>
 		<button type="submit" name="update">Update</button>
+		<?php if ($row['status'] != 'Resolved'): ?>
+			<button type="submit" name="resolve" onclick="return confirm('Mark this complaint as Resolved?');">Mark as Resolved</button>
+		<?php endif; ?>
 		<a href="manage_complaints.php?department=<?php echo urlencode($row['department']); ?>">Cancel</a>
 	</form>
 </body>

@@ -24,5 +24,31 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
 <body>
 	<h1>Admin!</h1>
 	<a href="logout.php">logout</a>
+	<hr>
+	<a href="manage_accounts.php">Manage</a>
+	<hr>
+	<table border="1">
+			<tr>
+				<th>Username</th>
+				<th>Address</th>
+				<th>Contact Number</th>
+				<th>Status</th>
+			</tr>
+	<?php 
+		$sql = "SELECT * FROM accounts WHERE status != 'user' ORDER BY status";
+		$prep = $pdo->prepare($sql);
+		$prep->execute();
+		$rows = $prep->fetchAll();
+		foreach($rows as $row){?>
+		
+			<tr>
+				<td><?php echo htmlspecialchars($row['username'])?></td>
+				<td><?php echo htmlspecialchars($row['address'])?></td>
+				<td><?php echo htmlspecialchars($row['contact_number'])?></td>
+				<td><?php echo htmlspecialchars($row['status'])?></td>
+			</tr>
+		
+	<?php }?>
+</table>
 </body>
 </html>

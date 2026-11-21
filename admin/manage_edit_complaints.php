@@ -1,6 +1,15 @@
 <?php
 session_start();
 require_once "../dbconn.php";
+date_default_timezone_set("Asia/Manila");
+
+
+
+if (!isset($_SESSION['ID'])) {
+	session_destroy();
+	header("location:../index.php");
+	exit();
+}
 
 //check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
@@ -59,12 +68,31 @@ if (isset($_POST['update'])) {
 		$deadline = null;
 	}
 	// Only allow these statuses and priorities.
-	if (($status == 'Pending' || $status == 'Under Investigation' || $status == 'Action Taken' || $status == 'Resolved' || $status == 'Rejected') && ($priority == null || $priority == 'Low' || $priority == 'Medium' || $priority == 'High')) {
-		$update = $pdo->prepare("UPDATE complaints SET status = :status, priority = :priority, deadline = :deadline WHERE ID = :id");
+		$statuses = ['Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'];
+		$priorities = ['Low', 'Medium', 'High'];
+
+	if (in_array($status, $statuses) && ($priority == null || in_array($priority, $priorities))) {
+
+		$responded = $row['date_responded'];
+		$resolved = $row['date_resolved'];
+
+		// First time it leaves Pending = responded.
+		if ($status != 'Pending' && $responded == '') {
+			$responded = date("Y-m-d H:i:s");
+		}
+
+		// First time it becomes Resolved = resolved.
+		if ($status == 'Resolved' && $resolved == '') {
+			$resolved = date("Y-m-d H:i:s");
+		}
+
+		$update = $pdo->prepare("UPDATE complaints SET status = :status, priority = :priority, deadline = :deadline, date_responded = :responded, date_resolved = :resolved WHERE ID = :id");
 		$update->execute([
 			':status' => $status,
 			':priority' => $priority,
 			':deadline' => $deadline,
+			':responded' => $responded,
+			':resolved' => $resolved,
 			':id' => $id
 		]);
 
@@ -75,6 +103,7 @@ if (isset($_POST['update'])) {
 		$error = "Invalid status or priority.";
 	}
 }
+
 ?>
 <!DOCTYPE html>
 <html>

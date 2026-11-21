@@ -3,8 +3,6 @@ session_start();
 require_once "../dbconn.php";
 date_default_timezone_set("Asia/Manila");
 
-
-
 if (!isset($_SESSION['ID'])) {
 	session_destroy();
 	header("location:../index.php");

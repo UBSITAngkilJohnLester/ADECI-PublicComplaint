@@ -2,13 +2,17 @@
 session_start();
 require_once "../dbconn.php";
 
-// Make sure the user is logged in.
 if (!isset($_SESSION['ID'])) {
 	header("location:../index.php");
 	exit();
 }
 
-// All announcements, newest first.
+$badgeColors = [
+	'Service Advisory' => 'bg-danger',
+	'Public Announcement' => 'bg-primary',
+	'Community Update' => 'bg-success'
+];
+
 $prep = $pdo->prepare("SELECT * FROM announcements ORDER BY ID DESC");
 $prep->execute();
 $announcements = $prep->fetchAll();
@@ -19,6 +23,7 @@ $announcements = $prep->fetchAll();
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Announcements</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 </head>
 <body>
 	<h1>Government Monitoring System (User)</h1>
@@ -37,6 +42,7 @@ $announcements = $prep->fetchAll();
 
 	<?php foreach ($announcements as $a): ?>
 		<div style="border:1px solid #999; padding:10px; margin-bottom:10px;">
+			<span class="badge <?php echo $badgeColors[$a['type']] ?? 'bg-secondary'; ?>"><?php echo htmlspecialchars($a['type']); ?></span>
 			<h3 style="margin:0;"><?php echo htmlspecialchars($a['title']); ?></h3>
 			<small><?php echo date("M d, Y h:i A", strtotime($a['date_posted'])); ?></small>
 			<p><?php echo nl2br(htmlspecialchars($a['message'])); ?></p>

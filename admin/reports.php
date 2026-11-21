@@ -17,10 +17,10 @@ if (!$account || $account['status'] != 'admin') {
 
 $responseColumn = "date_responded";
 
-$check = $pdo->prepare("SHOW COLUMNS FROM complaints LIKE ?");
+$check = $pdo->prepare("SELECT COLUMN_NAME FROM information_schema.COLUMNS
+	WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'complaints' AND COLUMN_NAME = ?");
 $check->execute([$responseColumn]);
 $hasResponse = $check->fetch() !== false;
-
 $prep = $pdo->prepare("SELECT d.department,
 		COUNT(c.ID) AS total,
 		COALESCE(SUM(c.status = 'Resolved'), 0) AS resolved,

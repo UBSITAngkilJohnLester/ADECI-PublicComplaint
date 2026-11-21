@@ -229,7 +229,7 @@ $announcements = $prep->fetchAll();
 						<a href="user_feedback.php?id=<?php echo $row['ID']; ?>">Give Feedback</a>
 					<?php } ?>
 					<?php ?>
-				</td>-
+				</td>
 			</tr>
 		<?php } ?>
 	</table>

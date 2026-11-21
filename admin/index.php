@@ -195,8 +195,9 @@ $summary = $prep->fetch();
 
 
 	<h3>Latest Complaints</h3>
-	<p><a href="manage_complaints.php"><button type="button">Manage Complaints</button></a></p>
-	<table border="1">
+	<p><a href="manage_complaints.php"><button type="button" class="btn bg-info text-white">Manage Complaints</button></a></p>
+	<div class="col-md-8">
+			<table class="table table-striped table-bordered">
 		<tr>
 			<th>Reference No.</th>
 			<th>Sent By</th>
@@ -231,6 +232,7 @@ $summary = $prep->fetch();
 			</tr>
 		<?php endforeach; ?>
 	</table>
+	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js" integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu" crossorigin="anonymous"></script>
 </body>

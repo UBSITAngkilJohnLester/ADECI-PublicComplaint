@@ -2,16 +2,30 @@
 session_start();
 require_once "../dbconn.php";
 
+if (!isset($_SESSION['ID'])) {
+	session_destroy();
+	header("location:../index.php");
+	exit();
+}
+
 //check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+if (!$account || $account['status'] != 'admin') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
 }
+
+	$badge = [
+		'Pending' => 'bg-warning text-white',
+		'Under Investigation' => 'bg-info text-white',
+		'Action Taken' => 'bg-primary text-white',
+		'Resolved' => 'bg-success text-white',
+		'Rejected' => 'bg-danger text-white'
+	];	
 
 
 // which department did the admin pick? (empty = none yet)
@@ -46,22 +60,38 @@ if ($department == "") {
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Manage Complaints</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/flatly/bootstrap.min.css" rel="stylesheet">
+
+		<style>
+		html { font-size: 112.5%; }
+		</style>
 </head>
 <body>
-	<h1>Government Monitoring System (Admin)</h1>
-	<nav>
-		<a href="index.php">Dashboard</a>
-		<a href="manage_complaints.php">Manage Complaints</a>
-		<a href="logout.php">Logout</a>
-	</nav>
-	<hr>
 
-	<h2>Manage Complaints</h2>
+
+
+
+	<div class="container-fluid p-4">
+		<h1 class="mb-2">Government Monitoring System (Admin)</h1>
+		<nav class="navbar bg-secondary-subtle sticky-top p-1">
+			<div class="container-fluid d-flex justify-content-start gap-4">
+				<a href="index.php" class="nav-item nav-link">Dashboard</a>
+				<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
+				<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
+				<a href="reports.php" class="nav-item nav-link">Reports</a>
+				<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
+				<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
+			</div>
+		</nav>
+		<hr>
+
+	<h2 class="mb-4">Manage Complaints</h2>
 
 	<?php if ($department == ""): ?>
 
-		<p>Pick a department:</p>
-		<table border="1">
+		<p class="fs-5">Pick a department:</p>
+		<div class="col-md-8">
+		<table class="table table-striped table-hover table-bordered align-middle text-center">
 			<tr>
 				<th>Department</th>
 				<th>Total</th>
@@ -81,7 +111,7 @@ if ($department == "") {
 				}
 				?>
 				<tr>
-					<td><a href="manage_complaints.php?department=<?php echo urlencode($d['department']); ?>"><?php echo $d['department']; ?></a></td>
+					<td><a href="manage_complaints.php?department=<?php echo urlencode($d['department']); ?>" class="fw-bold"><?php echo htmlspecialchars($d['department']); ?></a></td>
 					<td><?php echo $total; ?></td>
 					<td><?php echo $pending; ?></td>
 				</tr>
@@ -91,9 +121,10 @@ if ($department == "") {
 	<?php else: ?>
 
 		<h3><?php echo htmlspecialchars($department); ?></h3>
-		<p><a href="manage_complaints.php">Back to departments</a></p>
+		<p><a href="manage_complaints.php" class="btn btn-warning btn-lg mb-3">Back to departments</a></p>
 
-		<table border="1">
+		<div class="table-responsive">
+		<table class="table table-striped table-hover table-bordered align-middle">
 			<tr>
 				<th>Reference No.</th>
 				<th>Sent By</th>
@@ -114,9 +145,9 @@ if ($department == "") {
 			<?php endif; ?>
 			<?php foreach ($complaints as $c): ?>
 				<tr>
-					<td><?php echo $c['reference_no']; ?></td>
+					<td><?php echo htmlspecialchars($c['reference_no']); ?></td>
 					<td><?php echo htmlspecialchars($c['username']); ?></td>
-					<td><?php echo $c['category']; ?></td>
+					<td><?php echo htmlspecialchars($c['category']); ?></td>
 					<td><?php echo htmlspecialchars($c['description']); ?></td>
 					<td>
 						<?php echo htmlspecialchars($c['street'] . ', ' . $c['barangay']); ?>
@@ -124,7 +155,12 @@ if ($department == "") {
 							<br>Near <?php echo htmlspecialchars($c['landmark']); ?>
 						<?php endif; ?>
 					</td>
-					<td><?php echo $c['status']; ?></td>
+
+					<td>
+						<span class="badge fs-6 <?php echo $badge[$c['status']] ?? 'bg-secondary'; ?>">
+								<?php echo htmlspecialchars($c['status']); ?>
+						</span>
+					</td>
 					<td>
 						<?php if ($c['priority'] == ''): ?>
 							Not set
@@ -138,14 +174,15 @@ if ($department == "") {
 						<?php else: ?>
 							<?php echo date("M d, Y", strtotime($c['deadline'])); ?>
 							<?php if ($c['deadline'] < date("Y-m-d") && $c['status'] != 'Resolved' && $c['status'] != 'Rejected'): ?>
-								<br>(Overdue)
+
+								<br><span class="badge bg-danger fs-6">Overdue</span>
 							<?php endif; ?>
 						<?php endif; ?>
 					</td>
 					<td><?php echo date("M d, Y", strtotime($c['date_submitted'])); ?></td>
 					<td>
 						<?php if ($c['photo_path'] != ''): ?>
-							<img src="../user/<?php echo $c['photo_path']; ?>" width="100">
+							<img src="../user/<?php echo htmlspecialchars($c['photo_path']); ?>" width="100" class="img-thumbnail">
 						<?php else: ?>
 							No photo
 						<?php endif; ?>
@@ -153,15 +190,17 @@ if ($department == "") {
 					<td>
 						<form method="post" action="manage_edit_complaints.php">
 							<input type="hidden" name="manage_id" value="<?php echo $c['ID']; ?>">
-							<button type="submit">Manage</button>
-						</form>
 
-						<!-- <a href="manage_complaint.php?id=<?php echo $c['ID']; ?>">Manage</a>-->
+							<button type="submit" class="btn btn-primary btn-lg">Manage</button>
+						</form>
 					</td>
 				</tr>
 			<?php endforeach; ?>
 		</table>
 
 	<?php endif; ?>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js" integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu" crossorigin="anonymous"></script>
+	</div>
+	</div>
 </body>
 </html>

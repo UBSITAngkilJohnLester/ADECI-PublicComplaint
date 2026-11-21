@@ -38,6 +38,9 @@ foreach ($row as $r) {
 	if ($r['status'] == "Resolved") {
 		$resolved++;
 	}
+	if ($r['status'] == "Rejected") {
+	$rejected++;
+	}
 }
 
 // complaints per department

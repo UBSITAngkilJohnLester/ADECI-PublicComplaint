@@ -35,7 +35,7 @@ if ($department == "") {
 		FROM complaints
 		JOIN accounts ON complaints.acc_id = accounts.ID
 		WHERE complaints.department = :department
-		ORDER BY FIELD(complaints.status, 'Pending', 'In Progress', 'Resolved', 'Rejected'), complaints.ID ASC");
+		ORDER BY FIELD(complaints.status, 'Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'), complaints.ID ASC");
 	$prep->execute([":department" => $department]);
 	$complaints = $prep->fetchAll();
 }
@@ -101,13 +101,15 @@ if ($department == "") {
 				<th>Description</th>
 				<th>Address</th>
 				<th>Status</th>
+				<th>Priority</th>
+				<th>Deadline</th>
 				<th>Date</th>
 				<th>Photo</th>
 				<th>Actions</th>
 			</tr>
 			<?php if (count($complaints) == 0): ?>
 				<tr>
-					<td colspan="9">No complaints for this department.</td>
+					<td colspan="11">No complaints for this department.</td>
 				</tr>
 			<?php endif; ?>
 			<?php foreach ($complaints as $c): ?>
@@ -123,6 +125,23 @@ if ($department == "") {
 						<?php endif; ?>
 					</td>
 					<td><?php echo $c['status']; ?></td>
+					<td>
+						<?php if ($c['priority'] == ''): ?>
+							Not set
+						<?php else: ?>
+							<?php echo htmlspecialchars($c['priority']); ?>
+						<?php endif; ?>
+					</td>
+					<td>
+						<?php if ($c['deadline'] == ''): ?>
+							Not set
+						<?php else: ?>
+							<?php echo date("M d, Y", strtotime($c['deadline'])); ?>
+							<?php if ($c['deadline'] < date("Y-m-d") && $c['status'] != 'Resolved' && $c['status'] != 'Rejected'): ?>
+								<br>(Overdue)
+							<?php endif; ?>
+						<?php endif; ?>
+					</td>
 					<td><?php echo date("M d, Y", strtotime($c['date_submitted'])); ?></td>
 					<td>
 						<?php if ($c['photo_path'] != ''): ?>

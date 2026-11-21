@@ -41,13 +41,30 @@ $error = "";
 
 // Save the new status when the form is submitted.
 if (isset($_POST['update'])) {
-	$status = $_POST['status'];
+		$status = $_POST['status'];
+	$priority = $_POST['priority'];
 
-	// Only allow these statuses.
-	if ($status == 'Pending' || $status == 'In Progress' || $status == 'Resolved' || $status == 'Rejected') {
-		$update = $pdo->prepare("UPDATE complaints SET status = :status WHERE ID = :id");
+	// Empty priority means "Not set".
+	if ($priority == '') {
+		$priority = null;
+	}
+
+	// Empty deadline means "Not set".
+	$deadline = $_POST['deadline'];
+	if ($deadline == '') {
+		$deadline = null;
+	}
+	// A wrong date is treated as "Not set".
+	if ($deadline != null && strtotime($deadline) == false) {
+		$deadline = null;
+	}
+	// Only allow these statuses and priorities.
+	if (($status == 'Pending' || $status == 'Under Investigation' || $status == 'Action Taken' || $status == 'Resolved' || $status == 'Rejected') && ($priority == null || $priority == 'Low' || $priority == 'Medium' || $priority == 'High')) {
+		$update = $pdo->prepare("UPDATE complaints SET status = :status, priority = :priority, deadline = :deadline WHERE ID = :id");
 		$update->execute([
 			':status' => $status,
+			':priority' => $priority,
+			':deadline' => $deadline,
 			':id' => $id
 		]);
 
@@ -55,7 +72,7 @@ if (isset($_POST['update'])) {
 		header("location:manage_complaints.php?department=" . urlencode($row['department']));
 		exit();
 	} else {
-		$error = "Invalid status.";
+		$error = "Invalid status or priority.";
 	}
 }
 ?>
@@ -84,10 +101,24 @@ if (isset($_POST['update'])) {
 			Status:<br>
 			<select name="status">
 				<option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-				<option value="In Progress" <?php if ($row['status'] == 'In Progress') echo 'selected'; ?>>In Progress</option>
+				<option value="Under Investigation" <?php if ($row['status'] == 'Under Investigation') echo 'selected'; ?>>Under Investigation</option>
+				<option value="Action Taken" <?php if ($row['status'] == 'Action Taken') echo 'selected'; ?>>Action Taken</option>
 				<option value="Resolved" <?php if ($row['status'] == 'Resolved') echo 'selected'; ?>>Resolved</option>
 				<option value="Rejected" <?php if ($row['status'] == 'Rejected') echo 'selected'; ?>>Rejected</option>
+				</select>
+		</p>
+		<p>
+			Priority:<br>
+			<select name="priority">
+				<option value="" <?php if ($row['priority'] == '') echo 'selected'; ?>>Not set</option>
+				<option value="Low" <?php if ($row['priority'] == 'Low') echo 'selected'; ?>>Low</option>
+				<option value="Medium" <?php if ($row['priority'] == 'Medium') echo 'selected'; ?>>Medium</option>
+				<option value="High" <?php if ($row['priority'] == 'High') echo 'selected'; ?>>High</option>
 			</select>
+		</p>
+		<p>
+			Deadline:<br>
+			<input type="date" name="deadline" value="<?php echo $row['deadline']; ?>">
 		</p>
 		<button type="submit" name="update">Update</button>
 		<a href="manage_complaints.php?department=<?php echo urlencode($row['department']); ?>">Cancel</a>

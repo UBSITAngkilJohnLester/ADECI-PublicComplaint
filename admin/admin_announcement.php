@@ -19,20 +19,31 @@ if (!$account || $account['status'] != 'admin') {
 
 $error = "";
 
+$types = ['Service Advisory', 'Public Announcement', 'Community Update'];
+$badgeColors = [
+	'Service Advisory' => 'bg-danger',
+	'Public Announcement' => 'bg-primary',
+	'Community Update' => 'bg-success'
+];
+
 
 if (isset($_POST['post'])) {
 	$title = trim($_POST['title']);
 	$message = trim($_POST['message']);
+	$type = $_POST['type'] ?? '';
 
 	if ($title == "" || $message == "") {
 		$error = "Please fill in both the title and the message.";
 	} elseif (strlen($title) > 150) {
 		$error = "Title is too long (150 characters max).";
+	} elseif (!in_array($type, $types, true)) {
+		$error = "Please choose a valid announcement type.";
 	} else {
-		$insert = $pdo->prepare("INSERT INTO announcements (title, message, acc_id) VALUES (:title, :message, :acc_id)");
+		$insert = $pdo->prepare("INSERT INTO announcements (title, message, type, acc_id) VALUES (:title, :message, :type, :acc_id)");
 		$insert->execute([
 			':title' => $title,
 			':message' => $message,
+			':type' => $type,
 			':acc_id' => $_SESSION['ID']
 		]);
 
@@ -41,7 +52,6 @@ if (isset($_POST['post'])) {
 	}
 }
 
-// Delete an announcement.
 if (isset($_POST['delete'])) {
 	$delete = $pdo->prepare("DELETE FROM announcements WHERE ID = ?");
 	$delete->execute([$_POST['announcement_id']]);
@@ -50,7 +60,6 @@ if (isset($_POST['delete'])) {
 	exit();
 }
 
-// All announcements, newest first.
 $prep = $pdo->prepare("SELECT * FROM announcements ORDER BY ID DESC");
 $prep->execute();
 $announcements = $prep->fetchAll();
@@ -70,6 +79,8 @@ $announcements = $prep->fetchAll();
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
 			<a href="manage_complaints.php" class="nav-item nav-link">Manage</a>
+			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
+			<a href="reports.php" class="nav-item nav-link">Reports</a>
 			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
@@ -88,6 +99,16 @@ $announcements = $prep->fetchAll();
 			<?php endif; ?>
 
 			<form method="post">
+				<div class="mb-3">
+					<label for="type" class="form-label">Type</label>
+					<select class="form-select" id="type" name="type" required>
+						<?php foreach ($types as $t): ?>
+							<option value="<?php echo htmlspecialchars($t); ?>" <?php if (($_POST['type'] ?? 'Public Announcement') === $t) echo 'selected'; ?>>
+								<?php echo htmlspecialchars($t); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				</div>
 				<div class="mb-3">
 					<label for="title" class="form-label">Title</label>
 					<input type="text" class="form-control" id="title" name="title" maxlength="150" required>
@@ -109,7 +130,10 @@ $announcements = $prep->fetchAll();
 			<div class="card shadow-sm p-3 mb-3">
 				<div class="d-flex justify-content-between align-items-start">
 					<div>
-						<h5 class="mb-1"><?php echo htmlspecialchars($a['title']); ?></h5>
+						<h5 class="mb-1">
+							<span class="badge <?php echo $badgeColors[$a['type']] ?? 'bg-secondary'; ?>"><?php echo htmlspecialchars($a['type']); ?></span>
+							<?php echo htmlspecialchars($a['title']); ?>
+						</h5>
 						<small class="text-muted"><?php echo date("M d, Y h:i A", strtotime($a['date_posted'])); ?></small>
 					</div>
 					<form method="post" onsubmit="return confirm('Delete this announcement?');">

@@ -2,7 +2,6 @@
 session_start();
 require_once "../dbconn.php";
 
-//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
@@ -13,14 +12,11 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'user') {
 	exit();
 }
 
-
-// Show the user's complains, newest first.
 $sql = "SELECT * FROM complaints WHERE acc_id = ? ORDER BY ID DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$_SESSION['ID']]);
 $complaints = $stmt->fetchAll();
 
-// Feedback
 $sql = "SELECT complaints.*, feedback.ID AS feedback_id
 		FROM complaints
 		LEFT JOIN feedback ON feedback.complaint_id = complaints.ID
@@ -30,7 +26,6 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$_SESSION['ID']]);
 $complaints = $stmt->fetchAll();
 
-// Counters for this user's own complaints only.
 $total = count($complaints);
 $pending = 0;
 $progress = 0;
@@ -56,7 +51,12 @@ foreach ($complaints as $c) {
 	}
 }
 
-// Latest 3 announcements from the admin.
+$badgeColors = [
+	'Service Advisory' => 'bg-danger',
+	'Public Announcement' => 'bg-primary',
+	'Community Update' => 'bg-success'
+];
+
 $prep = $pdo->prepare("SELECT * FROM announcements ORDER BY ID DESC LIMIT 3");
 $prep->execute();
 $announcements = $prep->fetchAll();
@@ -141,7 +141,7 @@ $announcements = $prep->fetchAll();
 	<?php endif; ?>
 	<?php foreach ($announcements as $a): ?>
 		<div style="border:1px solid #999; padding:10px; margin-bottom:10px;">
-			<strong><?php echo htmlspecialchars($a['category']); ?></strong>
+			<span class="badge <?php echo $badgeColors[$a['type']] ?? 'bg-secondary'; ?>"><?php echo htmlspecialchars($a['type']); ?></span>
 			<h3 style="margin:0;"><?php echo htmlspecialchars($a['title']); ?></h3>
 			<small><?php echo date("M d, Y h:i A", strtotime($a['date_posted'])); ?></small>
 			<p><?php echo nl2br(htmlspecialchars($a['message'])); ?></p>
@@ -154,7 +154,6 @@ $announcements = $prep->fetchAll();
 
 	<h2>My Complaints</h2>
 
-	<!---Displays complaint added--->
 	<?php if (isset($_SESSION['success'])): ?>
 		<p style="color: green;"><strong><?php echo htmlspecialchars($_SESSION['success']); ?></strong></p>
 		<?php unset($_SESSION['success']); ?>

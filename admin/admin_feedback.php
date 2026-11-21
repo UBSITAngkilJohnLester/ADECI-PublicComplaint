@@ -12,7 +12,7 @@ $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+if (!$account || $account['status'] != 'admin') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
@@ -53,6 +53,7 @@ $feedbacks = $prep->fetchAll();
 		<a href="index.php">Dashboard</a> |
 		<a href="manage_complaints.php">Manage Complaints</a> |
 		<a href="admin_feedback.php">Feedback</a> |
+		<a href="reports.php">Reports</a> |
 		<a href="admin_announcement.php">Announcement</a> |
 		<a href="logout.php">Logout</a>
 	</nav>

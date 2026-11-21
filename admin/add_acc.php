@@ -64,6 +64,7 @@ if (isset($_POST['register'])) {
             $status
         ]);
 
+
         header("location:manage_accounts.php");
         exit();
     }

@@ -13,6 +13,8 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
     exit();
 }
 
+if(isset($_POST['edit']))
+    $_SESSION['EDIT_ID'] = $_POST['edit'];
 ?>
 
 <!DOCTYPE html>
@@ -45,19 +47,18 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
         $prep->execute();
         $rows = $prep->fetchAll();
         foreach ($rows as $row) { ?>
-
             <tr>
                 <td><?php echo htmlspecialchars($row['username']) ?></td>
                 <td><?php echo htmlspecialchars($row['address']) ?></td>
-                <td><?php echo htmlspecialchars($row['contact_number'])?></td>
+                <td><?php echo htmlspecialchars($row['contact_number']) ?></td>
                 <td><?php echo htmlspecialchars($row['status']) ?></td>
-                <td><?php if ($row['status'] == "user" || $row['status'] == "admin") {?>
-                    <button disabled>Edit</button>
-                <?php }else {?>
-                    <button>Edit</button>    
-                <?php }?></td>
+                <td><?php if ($row['status'] == "admin") { ?>
+                        <button disabled>Edit</button>
+                    <?php } else { ?>
+                        <form method="post" action="edit_acc.php"><button name="edit" value="<?php echo $row['ID'];?>">Edit</button></form>
+                    <?php } ?>
+                </td>
             </tr>
-
         <?php } ?>
     </table>
 </body>

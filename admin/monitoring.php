@@ -79,8 +79,6 @@ $today = date("Y-m-d");
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 </head>
 <body>
-	<div class="container-fluid p-4">
-	<h1 class="mb-2">Government Monitoring System (Admin)</h1>
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
@@ -91,6 +89,9 @@ $today = date("Y-m-d");
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
+	<div class="container-fluid p-4">
+	<h1 class="mb-2">Government Monitoring System (Admin)</h1>
+	
 	<hr>
 
 	<h2 class="mb-2">Monitoring</h2>

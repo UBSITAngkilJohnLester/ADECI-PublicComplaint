@@ -120,9 +120,10 @@ if (isset($_POST['register'])) {
                             <select class="form-select" name="status" id="status" required>
                                 <option value="" selected disabled>Status</option>
                                 <option value="admin">Administrator</option>
-                                <option value="head_officer">Head Officer</option>
-                                <option value="health_officer">Health Officer</option>
-                                <option value="environment_officer">Environment Officer</option>
+                                <option value="head_officer">Barangay Captain</option>
+                                <option value="secretary">Barangay Secretary</option>
+                                <option value="health_officer">Kagawad (Health and Sanitation)</option>
+                                <option value="environment_officer">Kagawad (Environment)</option>
                             </select>
                         </div>
                     </div>

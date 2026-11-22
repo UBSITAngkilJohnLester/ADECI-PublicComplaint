@@ -134,9 +134,10 @@ if(isset($_POST['update'])){
                             <select class="form-select" name="status" id="status" required>
                                 <option value="" selected disabled>Status</option>
                                 <option value="admin" <?= $row['status'] == 'admin' ? 'selected' : '' ?>>Administrator</option>
-                                <option value="head_officer" <?= $row['status'] == 'head_officer' ? 'selected' : '' ?>>Head Officer</option>
-                                <option value="health_officer" <?= $row['status'] == 'health_officer' ? 'selected' : '' ?>>Health Officer</option>
-                                <option value="environment_officer" <?= $row['status'] == 'environment_officer' ? 'selected' : '' ?>>Environment Officer</option>
+                                <option value="head_officer" <?= $row['status'] == 'head_officer' ? 'selected' : '' ?>>Barangay Captain</option>
+                                <option value="secretary" <?= $row['status'] == 'secretary' ? 'selected' : '' ?>>Barangay Secretary</option>
+                                <option value="health_officer" <?= $row['status'] == 'health_officer' ? 'selected' : '' ?>>Kagawad (Health and Sanitation)</option>
+                                <option value="environment_officer" <?= $row['status'] == 'environment_officer' ? 'selected' : '' ?>>Kagawad (Environment)</option>
                             </select>
                         </div>
                     </div>

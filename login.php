@@ -29,7 +29,7 @@ if (isset($_POST['login'])) {
 
 				header("location:user/index.php");
 				exit();
-			} else if (password_verify($password, $row['password']) && $row['status'] == "head_officer") {
+			} else if (password_verify($password, $row['password']) && $row['status'] == "barangay captain") {
 				$_SESSION['USERNAME'] = $row['username'];
 				$_SESSION['FIRSTNAME'] = $row['firstname'];
 				$_SESSION['ID'] = $row['ID'];
@@ -48,7 +48,16 @@ if (isset($_POST['login'])) {
 				$_SESSION['FIRSTNAME'] = $row['firstname'];
 				$_SESSION['ID'] = $row['ID'];
 
+
 				header("location:health_officer/index.php");
+				exit();
+
+			} else if (password_verify($password, $row['password']) && $row['status'] == "secretary") {
+				$_SESSION['USERNAME'] = $row['username'];
+				$_SESSION['FIRSTNAME'] = $row['firstname'];
+				$_SESSION['ID'] = $row['ID'];
+
+				header("location:secretary/index.php");
 				exit();
 			}else{
 				header("location:index.php");

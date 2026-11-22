@@ -27,11 +27,13 @@ $announcements = $prep->fetchAll();
 </head>
 <body>
 	<h1>Government Monitoring System (User)</h1>
-	<nav>
-		<a href="index.php">My Complaints</a> |
-		<a href="announcements.php">Announcements</a> |
-		<a href="logout.php">Logout</a>
-	</nav>
+	<nav class="navbar bg-secondary-subtle sticky-top p-1">
+            <div class="container-fluid d-flex justify-content-start gap-4">
+                <a href="index.php" class="nav-item nav-link">My Complaints</a>
+                <a href="announcements.php" class="nav-item nav-link">Announcements</a>
+                <a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
+            </div>
+        </nav>
 	<hr>
 
 	<h2>Announcements</h2>

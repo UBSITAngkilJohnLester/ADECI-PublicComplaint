@@ -32,18 +32,16 @@
 
 	// start empty, so the form has something to show on the first visit
 	$description = "";
-	$barangay    = "";
 	$street      = "";
 	$landmark    = "";
 
 	if (isset($_POST['submit'])) {
 		$description = trim($_POST['description']);
-		$barangay    = trim($_POST['barangay']);
 		$street      = trim($_POST['street']);
 		$landmark    = trim($_POST['landmark']);
 		$photoPath   = '';
 
-		if ($description == '' || $barangay == '' || $street == '') {
+		if ($description == '' || $street == '') {
 			$errors[] = "Please fill in all required fields.";
 		}
 
@@ -76,6 +74,7 @@
 
 		//if no errors, the function is allowed to run
 		if (empty($errors)) {
+			$barangay = "Camp 7";
 			$reference  = "CMP-" . date("Ymd") . "-" . rand(1000, 9999);
 
 			$insert = "INSERT INTO complaints(reference_no, department, category, description, barangay, street, landmark, photo_path, status, acc_id)
@@ -138,15 +137,18 @@
 		<tr>
 			<td>Location Details</td>
 			<td>
-				<input type="text" name="barangay" value="<?php echo htmlspecialchars($barangay); ?>" placeholder="Barangay" maxlength="100" required>
-				<input type="text" name="street" value="<?php echo htmlspecialchars($street); ?>" placeholder="Street / Purok / Subdivision" maxlength="100" required>
+				<input type="text" name="street" value="<?php echo htmlspecialchars($street); ?>" placeholder="Purok / Sitio / Street" maxlength="100" required>
 				<input type="text" name="landmark" value="<?php echo htmlspecialchars($landmark); ?>" placeholder="Nearest landmark (optional)" maxlength="100">
 		</td>
 		</tr>
 
 			<tr>
 				<td>Photo Evidence</td>
-				<td><input type="file" name="photo" accept="image/*"></td>
+				<td>
+					<input type="file" name="photo" id="photo" accept="image/*">
+					<br>
+					<img id="preview" src="" alt="Photo preview" width="200" style="display:none; margin-top:8px;">
+				</td>
 			</tr>
 			<tr>
 				<td><button type="submit" name="submit">Submit</button></td>
@@ -155,5 +157,18 @@
 
 		</table>
 	</form>
+
+	<script>
+		document.getElementById('photo').addEventListener('change', function () {
+			var preview = document.getElementById('preview');
+			if (this.files && this.files[0]) {
+				preview.src = URL.createObjectURL(this.files[0]);
+				preview.style.display = 'block';
+			} else {
+				preview.src = '';
+				preview.style.display = 'none';
+			}
+		});
+	</script>
 </body>
 </html>

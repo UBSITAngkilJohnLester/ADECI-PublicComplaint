@@ -44,7 +44,6 @@
 	if (isset($_POST['update'])) {
 		$description = $_POST['description'];
 		$street = $_POST['street'];
-		$barangay = $_POST['barangay'];
 		$landmark = $_POST['landmark'];
 
 		// Keep the old photo unless a new one is uploaded.
@@ -66,7 +65,6 @@
 			$update = $pdo->prepare("UPDATE complaints SET
 				description = :description,
 				street = :street,
-				barangay = :barangay,
 				landmark = :landmark,
 				photo_path = :photo_path
 				WHERE ID = :id AND acc_id = :acc_id");
@@ -74,7 +72,6 @@
 		$update->execute([
 			':description' => $description,
 			':street' => $street,
-			':barangay' => $barangay,
 			':landmark' => $landmark,
 			':photo_path' => $photo_path,
 			':id' => $id,
@@ -109,10 +106,6 @@
 		<p>
 			Street:<br>
 			<input type="text" name="street" value="<?php echo htmlspecialchars($row['street']); ?>" required>
-		</p>
-		<p>
-			Barangay:<br>
-			<input type="text" name="barangay" value="<?php echo htmlspecialchars($row['barangay']); ?>" required>
 		</p>
 		<p>
 			Landmark:<br>

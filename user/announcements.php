@@ -31,6 +31,7 @@ $announcements = $prep->fetchAll();
             <div class="container-fluid d-flex justify-content-start gap-4">
                 <a href="index.php" class="nav-item nav-link">My Complaints</a>
                 <a href="announcements.php" class="nav-item nav-link">Announcements</a>
+				<a href="acc.php" class="nav-item nav-link">Account</a>
                 <a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
             </div>
         </nav>

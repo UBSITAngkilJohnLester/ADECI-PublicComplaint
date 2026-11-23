@@ -27,7 +27,6 @@ $badge = [
     'Rejected' => 'bg-danger text-white'
 ];
 
-// this officer's department is fixed (must match complaints.department exactly)
 $department = "Health and Sanitation";
 
 // complaints of this department, Pending first, oldest first

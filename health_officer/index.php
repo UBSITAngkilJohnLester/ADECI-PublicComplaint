@@ -9,7 +9,7 @@ if (!isset($_SESSION['ID'])) {
 }
 
 //check account status
-$prep = $pdo->prepare("SELECT status, department FROM accounts WHERE ID = ?");
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
@@ -27,13 +27,7 @@ $badge = [
     'Rejected' => 'bg-danger text-white'
 ];
 
-// the office this officer belongs to (set on the account)
-$department = $account['department'];
-if (empty($department)) {
-    session_destroy();
-    header("location:../index.php");
-    exit();
-}
+$department = "Health and Sanitation";
 
 // complaints of this department, Pending first, oldest first
 $prep = $pdo->prepare("SELECT complaints.*, accounts.username

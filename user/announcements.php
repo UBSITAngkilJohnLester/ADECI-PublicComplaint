@@ -26,7 +26,7 @@ $announcements = $prep->fetchAll();
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 </head>
 <body>
-	<h1>Government Monitoring System (User)</h1>
+	<h1>Barangay Camp 7: Service Monitoring System</h1>
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
             <div class="container-fluid d-flex justify-content-start gap-4">
                 <a href="index.php" class="nav-item nav-link">My Complaints</a>

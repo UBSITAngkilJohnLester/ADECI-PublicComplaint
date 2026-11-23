@@ -39,10 +39,10 @@ if(isset($_POST['edit']))
             <th>Address</th>
             <th>Contact Number</th>
             <th>Status</th>
-            <th>Edit Status</th>
+            <th>Reset Password</th>
         </tr>
         <?php
-        $sql = "SELECT * FROM accounts WHERE status != 'user' ORDER BY status";
+        $sql = "SELECT * FROM accounts ORDER BY status";
         $prep = $pdo->prepare($sql);
         $prep->execute();
         $rows = $prep->fetchAll();
@@ -53,9 +53,9 @@ if(isset($_POST['edit']))
                 <td><?php echo htmlspecialchars($row['contact_number']) ?></td>
                 <td><?php echo htmlspecialchars($row['status']) ?></td>
                 <td><?php if ($row['status'] == "admin") { ?>
-                        <button disabled>Edit</button>
+                        <button disabled>Reset Password</button>
                     <?php } else { ?>
-                        <form method="post" action="edit_acc.php"><button name="edit" value="<?php echo $row['ID'];?>">Edit</button></form>
+                        <form method="post"><button name="edit" value="<?php echo $row['ID'];?>">Reset Password</button></form>
                     <?php } ?>
                 </td>
             </tr>

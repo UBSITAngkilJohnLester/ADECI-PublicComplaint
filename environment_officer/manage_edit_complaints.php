@@ -3,22 +3,15 @@ session_start();
 require_once "../dbconn.php";
 date_default_timezone_set("Asia/Manila");
 
-// [SECURITY 1] Check that the user is logged in FIRST.
-if (!isset($_SESSION['ID'])) {
-	session_destroy();
-	header("location:../index.php");
-	exit();
-}
-
-// [SECURITY 2] Check that the account is an environment officer.
+//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!$account || $account['status'] != 'environment_officer') {
-	session_destroy();
-	header("location:../index.php");
-	exit();
+if (!isset($_SESSION['ID']) || $account['status'] != 'environment_officer') {
+    session_destroy();
+    header("location:../index.php");
+    exit();
 }
 
 // the office this officer belongs to (must match complaints.department exactly)
@@ -159,12 +152,13 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
+			<a href="acc.php" class="nav-item nav-link">Account</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
 
 	<div class="container-fluid p-4">
-		<h1 class="mb-2">Government Monitoring System (Kagawad - Environment)</h1>
+		<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 		<hr>
 		<h2 class="mb-4">Update Complaint Status</h2>
 

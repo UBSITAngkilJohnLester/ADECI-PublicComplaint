@@ -19,7 +19,7 @@
 
 	<div class="container min-vh-100 d-flex justify-content-center align-items-center">
 		<div class="card show p-4" style="width: 100%; max-width: 450px;">
-			<h1 class="text-center mb-3">Government Monitoring System</h1>
+			<h1 class="text-center mb-3">Barangay Camp 7: Service Monitoring System</h1>
 			<hr>
 			<h2 class="text-center mb-4">Login</h2>
 			<form method="post" action="login.php">

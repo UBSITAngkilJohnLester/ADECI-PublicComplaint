@@ -9,7 +9,7 @@ if (!isset($_SESSION['ID'])) {
 }
 
 //check account status
-$prep = $pdo->prepare("SELECT status, department FROM accounts WHERE ID = ?");
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
@@ -27,13 +27,8 @@ $badge = [
     'Rejected' => 'bg-danger text-white'
 ];
 
-// the office this officer belongs to (set on the account)
-$department = $account['department'];
-if (empty($department)) {
-    session_destroy();
-    header("location:../index.php");
-    exit();
-}
+// this officer's department is fixed (must match complaints.department exactly)
+$department = "Health and Sanitation";
 
 // complaints of this department, Pending first, oldest first
 $prep = $pdo->prepare("SELECT complaints.*, accounts.username
@@ -85,11 +80,12 @@ foreach ($complaints as $c) {
         <nav class="navbar bg-secondary-subtle sticky-top p-1">
             <div class="container-fluid d-flex justify-content-start gap-4">
                 <a href="index.php" class="nav-item nav-link">Dashboard</a>
+                <a href="acc.php" class="nav-item nav-link">Account</a>
                 <a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
             </div>
         </nav>
     <div class="container-fluid p-4">
-        <h1 class="mb-2">Government Monitoring System (Health and Sanitation)</h1>
+        <h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
         <hr>
 
         <h2 class="mb-4">Complaints</h2>

@@ -2,12 +2,12 @@
 session_start();
 require_once "../dbconn.php";
 
-//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!isset($_SESSION['ID']) || $account['status'] != 'barangay captain') {
+// check user is logged in and with the right credentials
+if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
@@ -39,7 +39,7 @@ foreach ($row as $r) {
 		$resolved++;
 	}
 	if ($r['status'] == "Rejected") {
-	$rejected++;
+		$rejected++;
 	}
 }
 
@@ -86,11 +86,12 @@ $summary = $prep->fetch();
 			<a href="monitoring.php" class="nav-item nav-link">Monitoring</a>
 			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
 			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
+			<a href="acc.php" class="nav-item nav-link">Account</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
 	<div class="container-fluid p-4">
-		<h1 class="mb-2">Government Monitoring System</h1>
+		<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 		<hr>
 		<h2 class="mb-4">Dashboard</h2>
 		<div class="row mb-2">

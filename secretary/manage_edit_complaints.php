@@ -146,11 +146,7 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Update Complaint Status</title>
-
-	<!-- [DESIGN 2] Bootswatch theme (same link as the other pages) -->
 	<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/flatly/bootstrap.min.css" rel="stylesheet">
-
-	<!-- [DESIGN 3] Bigger text for easier reading -->
 	<style>
 		html { font-size: 112.5%; }
 	</style>
@@ -159,12 +155,13 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
+			<a href="acc.php" class="nav-item nav-link">Account</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
 
 	<div class="container-fluid p-4">
-		<h1 class="mb-2">Government Monitoring System (Barangay Secretary)</h1>
+		<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 		<hr>
 		<h2 class="mb-4">Update Complaint Status</h2>
 

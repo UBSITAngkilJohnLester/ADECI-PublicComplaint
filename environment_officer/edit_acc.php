@@ -2,17 +2,11 @@
 session_start();
 require_once "../dbconn.php";
 
-//check account status
-$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
-$prep->execute([$_SESSION['ID']]);
-$account = $prep->fetch();
-
 $message = "";
 $wrongcontact = "";
 
 $usernameexist = false;
 $invalidcontact = false;
-$contactrow = false;
 
 $firstname = "";
 $lastname = "";
@@ -20,45 +14,39 @@ $username = "";
 $address = "";
 $contact = "";
 
-if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
+//check account status
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
+$prep->execute([$_SESSION['ID']]);
+$account = $prep->fetch();
+
+if (!isset($_SESSION['ID']) || $account['status'] != 'environment_officer') {
     session_destroy();
     header("location:../index.php");
     exit();
 }
-if(isset($_POST['edit'])){
-    $_SESSION['EDIT_ID'] = $_POST['edit'];
-}
 
-$sql = "SELECT * FROM accounts WHERE ID =?";
+$sql = "SELECT * FROM accounts WHERE ID = ?";
 $prep = $pdo->prepare($sql);
-$prep->execute([$_SESSION['EDIT_ID']]);
+$prep->execute([$_SESSION['ID']]);
 $row = $prep->fetch();
 
-if(isset($_POST['update'])){
+if (isset($_POST['edit'])) {
     $firstname = htmlspecialchars($_POST['firstname']);
     $lastname = htmlspecialchars($_POST['lastname']);
     $username = htmlspecialchars($_POST['username']);
     $address = htmlspecialchars($_POST['address']);
     $contact = htmlspecialchars($_POST['contact']);
-    $status = htmlspecialchars($_POST['status']);
-    $id = $_SESSION['EDIT_ID'];
+    $id = $_SESSION['ID'];
 
-    $sql = "SELECT * FROM accounts WHERE ID != ? AND username = ?";
+    $sql = "SELECT username FROM accounts WHERE id != ? AND username = ?";
     $prep = $pdo->prepare($sql);
-    $prep->execute([
-            $_SESSION['EDIT_ID'], 
-            $username
-        ]);
+    $prep->execute([$id, $username]);
     $rows = $prep->fetch();
 
     if ($rows) {
         $usernameexist = true;
-        $message = "Username already exists.";
-    }
-
-    if ($contactrow) {
-        $invalidcontact = true;
-        $wrongcontact = "Contact number is already being used.";
+        $message = "Username already exists. Try a different one.";
+        $username = "";
     }
 
     if (!preg_match('/^[0-9]{11}$/', $contact)) {
@@ -67,36 +55,49 @@ if(isset($_POST['update'])){
         $contact = "";
     }
 
-    if (!$usernameexist && !$invalidcontact && !$contactrow) {
-        $sql2 = "UPDATE accounts SET firstname = ?, lastname = ?, contact_number = ?, address = ?, status = ? WHERE id = ?";
+    if (!$usernameexist && !$invalidcontact) {
+        $sql2 = "UPDATE accounts SET firstname = ?, lastname = ?, username = ?, contact_number = ?, address = ? WHERE id = ?";
         $prep2 = $pdo->prepare($sql2);
         $prep2->execute([
             $firstname,
             $lastname,
+            $username,
             $contact,
             $address,
-            $status,
             $id
         ]);
 
-        header("location:manage_accounts.php");
+        header("location:index.php");
         exit();
     }
 }
-
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 
-    <title>Document</title>
 </head>
 
-<body>
+<style>
+    html {
+        scrollbar-gutter: stable;
+    }
+</style>
+
+<body class="bg-secondary-subtle">
+    <nav class="navbar bg-secondary-subtle sticky-top p-1">
+        <div class="container-fluid d-flex justify-content-start gap-4">
+            <a href="index.php" class="nav-item nav-link">Dashboard</a>
+            <a href="acc.php" class="nav-item nav-link">Account</a>
+            <a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
+        </div>
+    </nav>
     <div class="container min-vh-100 d-flex justify-content-center align-items-center">
         <div class="card show p-4" style="width: 100%; max-width: 450px;">
             <?php if (!empty($message)) { ?>
@@ -111,9 +112,9 @@ if(isset($_POST['update'])){
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php } ?>
-            <h1 class="text-center mb-3">Government Monitoring System</h1>
+            <h1 class="text-center mb-3">Barangay Camp 7: Service Monitoring System</h1>
             <hr>
-            <h2 class="text-center mb-4">Create Account</h2>
+            <h2 class="text-center mb-4">Edit Details</h2>
             <form method="post">
                 <div class="row">
                     <div class="col">
@@ -126,19 +127,6 @@ if(isset($_POST['update'])){
                         <div class="mb-3">
                             <label for="lastname" class="form-label">Last Name</label>
                             <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $row['lastname'] ?>" placeholder="e.g. Santos" required>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select" name="status" id="status" required>
-                                <option value="" selected disabled>Status</option>
-                                <option value="admin" <?= $row['status'] == 'admin' ? 'selected' : '' ?>>Administrator</option>
-                                <option value="head_officer" <?= $row['status'] == 'head_officer' ? 'selected' : '' ?>>Barangay Captain</option>
-                                <option value="secretary" <?= $row['status'] == 'secretary' ? 'selected' : '' ?>>Barangay Secretary</option>
-                                <option value="health_officer" <?= $row['status'] == 'health_officer' ? 'selected' : '' ?>>Kagawad (Health and Sanitation)</option>
-                                <option value="environment_officer" <?= $row['status'] == 'environment_officer' ? 'selected' : '' ?>>Kagawad (Environment)</option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -161,14 +149,13 @@ if(isset($_POST['update'])){
                     </div>
                 </div>
 
-                <button type="submit" name="update" class="btn btn-primary">Update</button>
-                <a href="manage_accounts.php" class="btn btn-warning">Cancel</a>
+                <button type="submit" name="edit" class="btn btn-primary">Save changes</button>
+                <a href="index.php" class="btn btn-warning">Cancel</a>
             </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js" integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu" crossorigin="anonymous"></script>
-</body>
 </body>
 
 </html>

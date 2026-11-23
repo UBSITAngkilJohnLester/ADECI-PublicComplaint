@@ -96,7 +96,7 @@ if (isset($_POST['register'])) {
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 			<?php } ?>
-			<h1 class="text-center mb-3">Government Monitoring System</h1>
+			<h1 class="text-center mb-3">Barangay Camp 7: Service Monitoring System</h1>
 			<hr>
 			<h2 class="text-center mb-4">Register</h2>
 			<form method="post">

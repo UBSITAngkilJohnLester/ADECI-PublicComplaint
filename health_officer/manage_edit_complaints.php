@@ -3,31 +3,17 @@ session_start();
 require_once "../dbconn.php";
 date_default_timezone_set("Asia/Manila");
 
-// [SECURITY 1] Check that the user is logged in FIRST.
-if (!isset($_SESSION['ID'])) {
-	session_destroy();
-	header("location:../index.php");
-	exit();
-}
-
-// [SECURITY 2] Check that the account is an admin.
-$prep = $pdo->prepare("SELECT status, department FROM accounts WHERE ID = ?");
+//check account status
+$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!$account || $account['status'] != 'health_officer') {
-	session_destroy();
-	header("location:../index.php");
-	exit();
+if (!isset($_SESSION['ID']) || $account['status'] != 'health_officer') {
+    session_destroy();
+    header("location:../index.php");
+    exit();
 }
 
-// the office this officer belongs to (set on the account)
-$myDepartment = $account['department'];
-
-// [SECURITY 3] Make a CSRF token once per session (used by the form below).
-if (empty($_SESSION['csrf_token'])) {
-	$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 
 // [DESIGN 1] Colors for each status (the words always stay visible).
 $badge = [
@@ -159,12 +145,13 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
+			<a href="acc.php" class="nav-item nav-link">Account</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
 
 	<div class="container-fluid p-4">
-		<h1 class="mb-2">Government Monitoring System (Health and Sanitation)</h1>
+		<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 	</div>
 
 	<!-- [DESIGN 4] Navigation bar (same as the other admin pages) -->

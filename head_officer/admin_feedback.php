@@ -2,22 +2,16 @@
 session_start();
 require_once "../dbconn.php";
 
-if (!isset($_SESSION['ID'])) {
-	header("location:../index.php");
-	exit();
-}
-
-//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!$account || $account['status'] != 'barangay captain') {
+// check user is logged in and with the right credentials
+if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
 }
-
 
 $prep = $pdo->prepare("SELECT COUNT(*) AS total,
 		ROUND(AVG(satisfaction_rating), 1) AS overall,
@@ -50,7 +44,7 @@ $feedbacks = $prep->fetchAll();
 </head>
 <body>
 	<div class="container-fluid p-4">
-	<h1 class="mb-2">Government Monitoring System (Admin)</h1>
+	<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
@@ -58,6 +52,7 @@ $feedbacks = $prep->fetchAll();
 			<a href="admin_feedback.php" class="nav-item nav-link">Feedback</a>
 			<a href="reports.php" class="nav-item nav-link">Reports</a>
 			<a href="admin_announcement.php" class="nav-item nav-link">Announcement</a>
+			<a href="acc.php" class="nav-item nav-link">Account</a>
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>

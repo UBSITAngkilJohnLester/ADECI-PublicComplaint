@@ -97,7 +97,7 @@ if (isset($_POST['register'])) {
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php } ?>
-            <h1 class="text-center mb-3">Government Monitoring System</h1>
+            <h1 class="text-center mb-3">Barangay Camp 7: Service Monitoring System</h1>
             <hr>
             <h2 class="text-center mb-4">Create Account</h2>
             <form method="post">
@@ -119,7 +119,6 @@ if (isset($_POST['register'])) {
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select" name="status" id="status" required>
                                 <option value="" selected disabled>Status</option>
-                                <option value="admin">Administrator</option>
                                 <option value="head_officer">Barangay Captain</option>
                                 <option value="secretary">Barangay Secretary</option>
                                 <option value="health_officer">Kagawad (Health and Sanitation)</option>

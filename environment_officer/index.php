@@ -69,11 +69,13 @@ foreach ($complaints as $c) {
     <style>
         html { font-size: 112.5%; }
     </style>
+    <link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
         <nav class="navbar bg-secondary-subtle sticky-top p-1">
             <div class="container-fluid d-flex justify-content-start gap-4">
                 <a href="index.php" class="nav-item nav-link">Dashboard</a>
+                <a href="feedback.php" class="nav-item nav-link">Feedback</a>
                 <a href="acc.php" class="nav-item nav-link">Account</a>
                 <a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
             </div>

@@ -59,6 +59,7 @@ if ($department == "") {
 		<style>
 		html { font-size: 112.5%; }
 		</style>
+	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
 

@@ -138,6 +138,7 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	<style>
 		html { font-size: 112.5%; }
 	</style>
+	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
 

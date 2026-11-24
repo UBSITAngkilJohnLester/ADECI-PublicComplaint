@@ -4,9 +4,11 @@ require_once "dbconn.php";
 
 $message = "";
 $wrongcontact = "";
+$contactmessage = "";
 
 $usernameexist = false;
 $invalidcontact = false;
+$contactexist = false;
 
 $firstname = "";
 $lastname = "";
@@ -38,9 +40,19 @@ if (isset($_POST['register'])) {
 		$invalidcontact = true;
 		$wrongcontact = "Invalid contact number.";
 		$contact = "";
-	} 
+	} else {
+		// contact number must not already belong to another account
+		$prep = $pdo->prepare("SELECT ID FROM accounts WHERE contact_number = ?");
+		$prep->execute([$contact]);
+
+		if ($prep->fetch()) {
+			$contactexist = true;
+			$contactmessage = "Contact number is already registered.";
+			$contact = "";
+		}
+	}
 	
-	if(!$usernameexist && !$invalidcontact){
+	if(!$usernameexist && !$invalidcontact && !$contactexist){
 		$sql2 = "INSERT INTO accounts(firstname, lastname, username, password, contact_number, address, status) VALUES(?,?,?,?,?,?,?)";
 		$prep2 = $pdo->prepare($sql2);
 		$prep2->execute([
@@ -72,6 +84,7 @@ if (isset($_POST['register'])) {
 	<title></title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 
+	<link rel="stylesheet" href="assets/css/barangay.css">
 </head>
 
 <style>
@@ -93,6 +106,12 @@ if (isset($_POST['register'])) {
 			if(!empty($wrongcontact)){?>
 			<div class="alert alert-<?php echo $wrongcontact; ?> alert-dismissible fade show alert-warning" role="alert">
 				<?php echo htmlspecialchars($wrongcontact, ENT_QUOTES, 'UTF-8'); ?>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<?php }
+			if(!empty($contactmessage)){?>
+			<div class="alert alert-warning alert-dismissible fade show" role="alert">
+				<?php echo htmlspecialchars($contactmessage, ENT_QUOTES, 'UTF-8'); ?>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 			<?php } ?>

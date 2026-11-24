@@ -1,0 +1,862 @@
+/* ==========================================================================
+   BARANGAY CAMP 7 — SERVICE MONITORING SYSTEM
+   One shared stylesheet for every page in every folder
+   (root, user, admin, head_officer, secretary, health_officer,
+    environment_officer).
+
+   Look: a barangay hall — deep civic blue, sun gold and flag red on warm
+   "paper" cream, with a serif heading face like an official notice board.
+
+   It restyles three kinds of pages at once, so nothing needs changing in
+   the PHP/HTML:
+     1. Pages using Bootstrap 5
+     2. Pages using Bootswatch "Flatly"
+     3. Plain, unstyled HTML pages (bare <table border="1">, <button>, etc.)
+
+   Link it AFTER Bootstrap:
+     root pages ......  assets/css/barangay.css
+     sub-folders .....  ../assets/css/barangay.css
+
+   To re-theme the whole system, change the colours in :root below.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Source+Sans+3:wght@400;600;700&display=swap");
+
+
+/* --------------------------------------------------------------------------
+   1. DESIGN TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+	--navy:        #0b2a5b;
+	--navy-dark:   #071d41;
+	--navy-soft:   #e8eef8;
+	--gold:        #f2b705;
+	--gold-dark:   #b98a00;
+	--gold-soft:   #fff4cc;
+	--red:         #b3261e;
+	--red-soft:    #fbe9e7;
+	--green:       #2e7d4f;
+	--green-soft:  #e4f3ea;
+	--sky:         #86c5e3;
+	--slate:       #5c6b80;
+
+	--paper:       #f7f4ec;
+	--card:        #ffffff;
+	--ink:         #1b2433;
+	--muted:       #5b6577;
+	--line:        #d6cfbb;
+	--line-soft:   #ece6d6;
+	--link:        #0b4da2;
+
+	--radius:      8px;
+	--shadow:      0 1px 2px rgba(11, 42, 91, .10), 0 4px 14px rgba(11, 42, 91, .07);
+	--gutter:      1.5rem;
+
+	--font-body:    "Source Sans 3", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-heading: "Merriweather", Georgia, "Times New Roman", serif;
+
+	/* ---- Re-point Bootstrap / Bootswatch to the same palette ---- */
+	--bs-body-font-family: var(--font-body);
+	--bs-body-color: var(--ink);
+	--bs-body-color-rgb: 27, 36, 51;
+	--bs-body-bg: var(--paper);
+	--bs-body-bg-rgb: 247, 244, 236;
+	--bs-border-color: var(--line);
+	--bs-link-color: var(--link);
+	--bs-link-color-rgb: 11, 77, 162;
+	--bs-link-hover-color: var(--navy-dark);
+	--bs-link-hover-color-rgb: 7, 29, 65;
+	--bs-primary: var(--navy);        --bs-primary-rgb: 11, 42, 91;
+	--bs-secondary: var(--slate);     --bs-secondary-rgb: 92, 107, 128;
+	--bs-success: var(--green);       --bs-success-rgb: 46, 125, 79;
+	--bs-info: var(--sky);            --bs-info-rgb: 134, 197, 227;
+	--bs-warning: var(--gold);        --bs-warning-rgb: 242, 183, 5;
+	--bs-danger: var(--red);          --bs-danger-rgb: 179, 38, 30;
+	--bs-secondary-bg: var(--navy-soft);
+	--bs-secondary-bg-subtle: var(--navy-soft);
+	--bs-box-shadow-sm: 0 1px 2px rgba(11, 42, 91, .10), 0 3px 10px rgba(11, 42, 91, .07);
+}
+
+
+/* --------------------------------------------------------------------------
+   2. BASE
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+	/* one size for every page (some pages used to set their own) */
+	font-size: 106.25% !important;
+	scrollbar-gutter: stable;
+	/* paper background with a Philippine-flag tricolour strip at the very top */
+	background:
+		linear-gradient(90deg, var(--navy) 0 33.34%, var(--gold) 33.34% 66.67%, var(--red) 66.67% 100%) top / 100% 6px no-repeat,
+		var(--paper);
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	padding-top: 6px;
+	font-family: var(--font-body);
+	font-size: 1rem;
+	line-height: 1.55;
+	color: var(--ink);
+	-webkit-font-smoothing: antialiased;
+}
+body[class], body {
+	background: transparent !important;       /* defeats .bg-secondary-subtle on <body> */
+}
+
+/* Plain pages (no .container): give their content a consistent side margin */
+body > * { margin-left: var(--gutter); margin-right: var(--gutter); }
+body > nav,
+body > .container-fluid,
+body > script,
+body > style { margin-left: 0; margin-right: 0; }
+body > .container { margin-left: auto; margin-right: auto; }
+body > .container-fluid { padding-left: var(--gutter) !important; padding-right: var(--gutter) !important; }
+
+img { max-width: 100%; height: auto; }
+small, .small { color: var(--muted); }
+
+::selection { background: var(--gold); color: var(--navy-dark); }
+
+:focus-visible {
+	outline: 3px solid var(--gold);
+	outline-offset: 2px;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. HEADINGS
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--font-heading);
+	color: var(--navy);
+	font-weight: 700;
+	line-height: 1.3;
+	letter-spacing: -.005em;
+}
+
+/* Page title / masthead — "Barangay Camp 7: Service Monitoring System" */
+h1 {
+	font-size: clamp(1.15rem, 2.2vw + .6rem, 1.7rem);
+	font-weight: 900;
+	color: #fff;
+	background: var(--navy);
+	border-left: 8px solid var(--gold);
+	border-radius: var(--radius);
+	padding: .85rem 1.25rem;
+	margin-top: 1.1rem;
+	margin-bottom: 1rem;
+	box-shadow: var(--shadow);
+}
+/* the horizontal rule right after the masthead is redundant */
+h1 + hr { display: none; }
+
+h2 {
+	font-size: 1.45rem;
+	margin-top: 1.5rem;
+	padding-left: .75rem;
+	border-left: 6px solid var(--gold);
+}
+h3 { font-size: 1.2rem; margin-top: 1.25rem; }
+h4 { font-size: 1.1rem; }
+h5, h6 { font-size: 1rem; }
+
+p { margin-top: 0; }
+
+hr {
+	border: 0;
+	border-top: 2px solid var(--line);
+	opacity: 1;
+	margin: 1.1rem 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   4. LINKS
+   -------------------------------------------------------------------------- */
+a {
+	color: var(--link);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+}
+a:hover { color: var(--navy-dark); text-decoration-color: var(--gold); text-decoration-thickness: 2px; }
+
+
+/* --------------------------------------------------------------------------
+   5. NAVIGATION BAR (every role's top menu)
+   -------------------------------------------------------------------------- */
+.navbar {
+	background: var(--navy) !important;       /* beats .bg-secondary-subtle */
+	border-bottom: 4px solid var(--gold);
+	border-radius: 0;
+	padding: 0 !important;
+	box-shadow: 0 3px 10px rgba(7, 29, 65, .25);
+	z-index: 1030;
+}
+.navbar > .container-fluid {
+	padding: 0 var(--gutter);
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .15rem 1.25rem !important;           /* beats .gap-4 */
+}
+/* when the menu sits inside the padded page wrapper, don't pad it twice */
+.container-fluid .navbar > .container-fluid { padding: 0 1rem; }
+
+.navbar .nav-link,
+.navbar a.nav-item {
+	display: inline-block;
+	color: #fff;
+	font-weight: 600;
+	font-size: .95rem;
+	letter-spacing: .02em;
+	padding: .8rem .35rem;
+	text-decoration: none;
+	border-bottom: 3px solid transparent;
+	margin-bottom: -4px;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus-visible {
+	color: var(--gold);
+	border-bottom-color: var(--gold);
+	background: transparent;
+}
+/* "Logout" link */
+.navbar .nav-link.ms-auto {
+	color: var(--gold);
+	border: 1.5px solid var(--gold);
+	border-radius: 6px;
+	padding: .3rem .95rem;
+	margin: .35rem 0;
+	border-bottom-width: 1.5px;
+}
+.navbar .nav-link.ms-auto:hover {
+	background: var(--gold);
+	color: var(--navy-dark);
+}
+
+
+/* --------------------------------------------------------------------------
+   6. LAYOUT HELPERS
+   -------------------------------------------------------------------------- */
+.container-fluid.p-4 { padding: var(--gutter) !important; }
+.row { --bs-gutter-x: 1rem; --bs-gutter-y: .85rem; }
+.card h1 + hr, .card hr { margin: 1rem 0; }
+
+
+/* --------------------------------------------------------------------------
+   7. CARDS  (login box, dashboard stat tiles, announcements, forms)
+   -------------------------------------------------------------------------- */
+.card {
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-top: 5px solid var(--navy);
+	border-radius: 10px;
+	box-shadow: var(--shadow);
+	color: var(--ink);
+}
+.card h4, .card h5 { margin-top: 0; }
+
+/* Dashboard stat tiles (they use .bg-primary / .bg-warning / ... on the card) */
+.card[class*="bg-"] {
+	border: 0;
+	border-bottom: 5px solid rgba(0, 0, 0, .22);
+	border-radius: 10px;
+	box-shadow: var(--shadow);
+	position: relative;
+	overflow: hidden;
+}
+.card[class*="bg-"] .card-body { padding: .25rem .25rem; }
+.card[class*="bg-"] h6 {
+	font-family: var(--font-body);
+	font-size: .8rem;
+	font-weight: 700;
+	letter-spacing: .09em;
+	text-transform: uppercase;
+	margin: 0 0 .35rem;
+	color: inherit;
+	opacity: .95;
+}
+.card[class*="bg-"] h2 {
+	font-family: var(--font-heading);
+	font-size: 2.3rem;
+	font-weight: 900;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	color: inherit;
+}
+.card.bg-warning, .card.bg-info { color: var(--navy-dark); }
+.card.bg-warning h2, .card.bg-info h2,
+.card.bg-warning h6, .card.bg-info h6 { color: var(--navy-dark); }
+
+/* Login / register / edit-account box: official-document feel with a seal */
+.card.show { border-top-width: 6px; padding: 2rem !important; }
+.card.show > h1 {
+	background: none;
+	border: 0;
+	box-shadow: none;
+	padding: 0;
+	margin: 0 0 .75rem;
+	color: var(--navy);
+	font-size: 1.3rem;
+	text-align: center;
+}
+.card.show > h1::before {
+	content: "";                            /* Camp 7 logo, cropped to a circle */
+	display: block;
+	width: 104px;
+	height: 104px;
+	margin: 0 auto 1rem;
+	border-radius: 50%;
+	background: #fff url("../img/camp7-logo.jpg") center / cover no-repeat;
+	border: 4px solid var(--gold);
+	box-shadow: 0 0 0 4px var(--navy), 0 4px 12px rgba(7, 29, 65, .3);
+}
+.card.show > h2 {
+	border: 0;
+	padding: 0;
+	margin-top: .25rem;
+	font-size: 1.2rem;
+	color: var(--navy);
+}
+.card.show > h2::after {
+	content: "";
+	display: block;
+	width: 56px;
+	height: 4px;
+	margin: .5rem auto 0;
+	background: var(--gold);
+	border-radius: 2px;
+}
+
+/* the login pages have no nav, so centre them on a soft backdrop */
+.container.min-vh-100 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+
+
+/* --------------------------------------------------------------------------
+   8. BUTTONS
+   -------------------------------------------------------------------------- */
+.btn,
+button:not(.btn-close),
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+	font-family: var(--font-body);
+	font-weight: 700;
+	font-size: 1rem;
+	letter-spacing: .02em;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .05s;
+}
+
+/* Plain <button>s (pages without Bootstrap) look like primary buttons */
+button:not(.btn):not(.btn-close),
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+	display: inline-block;
+	background: var(--navy);
+	color: #fff;
+	border: 2px solid var(--navy);
+	padding: .5rem 1.15rem;
+	line-height: 1.4;
+}
+button:not(.btn):not(.btn-close):hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover {
+	background: var(--navy-dark);
+	border-color: var(--navy-dark);
+	box-shadow: 0 2px 6px rgba(7, 29, 65, .3);
+}
+button:not(.btn):not(.btn-close):active { transform: translateY(1px); }
+
+button:disabled,
+input[type="submit"]:disabled,
+.btn:disabled,
+.btn.disabled {
+	opacity: .45;
+	cursor: not-allowed;
+	box-shadow: none;
+}
+button:not(.btn):not(.btn-close):disabled {
+	background: var(--slate);
+	border-color: var(--slate);
+}
+
+/* Bootstrap buttons */
+.btn {
+	padding: .5rem 1.15rem;
+	border-width: 2px;
+	background-image: none !important;        /* flat buttons whatever theme loads */
+	text-shadow: none;
+}
+.btn-lg { padding: .65rem 1.4rem; font-size: 1.1rem; }
+.btn-sm { padding: .3rem .8rem; font-size: .88rem; }
+
+.btn-primary {
+	--bs-btn-color: #fff;
+	--bs-btn-bg: var(--navy);
+	--bs-btn-border-color: var(--navy);
+	--bs-btn-hover-color: #fff;
+	--bs-btn-hover-bg: var(--navy-dark);
+	--bs-btn-hover-border-color: var(--navy-dark);
+	--bs-btn-active-color: #fff;
+	--bs-btn-active-bg: var(--navy-dark);
+	--bs-btn-active-border-color: var(--navy-dark);
+	--bs-btn-focus-shadow-rgb: 242, 183, 5;
+	--bs-btn-disabled-bg: var(--navy);
+	--bs-btn-disabled-border-color: var(--navy);
+}
+.btn-warning {                           /* "Cancel" / "Back" — gold */
+	--bs-btn-color: var(--navy-dark);
+	--bs-btn-bg: var(--gold);
+	--bs-btn-border-color: var(--gold);
+	--bs-btn-hover-color: var(--navy-dark);
+	--bs-btn-hover-bg: #ffc933;
+	--bs-btn-hover-border-color: #ffc933;
+	--bs-btn-active-color: var(--navy-dark);
+	--bs-btn-active-bg: #e0a800;
+	--bs-btn-active-border-color: #e0a800;
+	--bs-btn-focus-shadow-rgb: 11, 42, 91;
+}
+.btn-success {
+	--bs-btn-color: #fff;
+	--bs-btn-bg: var(--green);
+	--bs-btn-border-color: var(--green);
+	--bs-btn-hover-color: #fff;
+	--bs-btn-hover-bg: #236340;
+	--bs-btn-hover-border-color: #236340;
+	--bs-btn-active-color: #fff;
+	--bs-btn-active-bg: #236340;
+	--bs-btn-active-border-color: #236340;
+	--bs-btn-focus-shadow-rgb: 242, 183, 5;
+}
+.btn-danger {
+	--bs-btn-color: #fff;
+	--bs-btn-bg: var(--red);
+	--bs-btn-border-color: var(--red);
+	--bs-btn-hover-color: #fff;
+	--bs-btn-hover-bg: #8f1d17;
+	--bs-btn-hover-border-color: #8f1d17;
+	--bs-btn-active-color: #fff;
+	--bs-btn-active-bg: #8f1d17;
+	--bs-btn-active-border-color: #8f1d17;
+	--bs-btn-focus-shadow-rgb: 242, 183, 5;
+}
+.btn-info {
+	--bs-btn-color: var(--navy-dark);
+	--bs-btn-bg: var(--sky);
+	--bs-btn-border-color: var(--sky);
+	--bs-btn-hover-color: var(--navy-dark);
+	--bs-btn-hover-bg: #a6d6ec;
+	--bs-btn-hover-border-color: #a6d6ec;
+}
+.btn-secondary {
+	--bs-btn-color: #fff;
+	--bs-btn-bg: var(--slate);
+	--bs-btn-border-color: var(--slate);
+	--bs-btn-hover-color: #fff;
+	--bs-btn-hover-bg: #46536a;
+	--bs-btn-hover-border-color: #46536a;
+}
+.btn-close:focus { box-shadow: 0 0 0 .2rem rgba(242, 183, 5, .6); }
+
+
+/* --------------------------------------------------------------------------
+   9. FORMS
+   -------------------------------------------------------------------------- */
+label, .form-label {
+	font-weight: 600;
+	color: var(--navy);
+	margin-bottom: .3rem;
+}
+.form-label.fw-bold { font-weight: 700 !important; }
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+input[type="tel"],
+input[type="file"],
+select,
+textarea,
+.form-control,
+.form-select {
+	font-family: var(--font-body);
+	font-size: 1rem;
+	color: var(--ink);
+	background-color: #fff;
+	border: 1.5px solid #b9b19a;
+	border-radius: 6px;
+	padding: .5rem .75rem;
+	transition: border-color .15s, box-shadow .15s;
+}
+input[type="text"]::placeholder,
+input[type="password"]::placeholder,
+textarea::placeholder,
+.form-control::placeholder { color: #8c8570; opacity: 1; }
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="file"]:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus {
+	border-color: var(--navy);
+	box-shadow: 0 0 0 .25rem rgba(242, 183, 5, .45);
+	outline: 0;
+	background-color: #fff;
+	color: var(--ink);
+}
+.form-control-lg, .form-select-lg { font-size: 1.15rem; padding: .6rem .9rem; }
+.form-control:disabled, .form-select:disabled { background: var(--line-soft); }
+
+/* Plain-HTML inputs: full width (up to a sensible limit) */
+input[type="text"]:not(.form-control),
+input[type="password"]:not(.form-control),
+input[type="email"]:not(.form-control),
+input[type="search"]:not(.form-control),
+input[type="tel"]:not(.form-control),
+input[type="number"]:not(.form-control),
+input[type="date"]:not(.form-control),
+select:not(.form-select),
+textarea:not(.form-control) {
+	width: 100%;
+	max-width: 30rem;
+}
+input[type="file"]:not(.form-control) { background: #fff; width: 100%; max-width: 30rem; }
+input[type="file"]::file-selector-button {
+	background: var(--navy-soft);
+	color: var(--navy);
+	border: 0;
+	border-right: 1.5px solid #b9b19a;
+	margin: -.5rem .75rem -.5rem -.75rem;
+	padding: .5rem 1rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+textarea { min-height: 6rem; resize: vertical; }
+
+/* search bar and similar one-line forms stay compact */
+form[method="GET"] input[type="text"],
+form[method="get"] input[type="text"] { width: auto; min-width: 16rem; }
+
+/* radio buttons & checkboxes */
+input[type="radio"],
+input[type="checkbox"] {
+	accent-color: var(--navy);
+	width: 1.1em;
+	height: 1.1em;
+	vertical-align: -.15em;
+	cursor: pointer;
+}
+label:has(> input[type="radio"]),
+label:has(> input[type="checkbox"]) {
+	font-weight: 400;
+	color: var(--ink);
+	cursor: pointer;
+	padding: .15rem .6rem .15rem 0;
+}
+label:has(> input:checked) { font-weight: 700; color: var(--navy); }
+
+/* Plain pages: the main form becomes a clean "paper form" panel */
+body > form {
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-top: 5px solid var(--navy);
+	border-radius: 10px;
+	box-shadow: var(--shadow);
+	padding: 1.25rem 1.5rem;
+	margin-top: 1rem;
+	margin-bottom: 1.25rem;
+	max-width: 62rem;
+}
+body > form h2 { font-size: 1.15rem; margin-top: .5rem; }
+body > form hr { margin: 1rem 0; }
+body > form p { margin-bottom: 1rem; }
+
+/* spacing between stacked plain controls inside a table form */
+table:not([border]):not(.table) td input[type="text"] { display: block; margin-bottom: .5rem; }
+
+
+/* --------------------------------------------------------------------------
+   10. TABLES  — Bootstrap .table AND bare <table border="1">
+   Records-book look: navy header, fine ruled grid, cream zebra rows.
+   -------------------------------------------------------------------------- */
+.table {
+	--bs-table-bg: #fff;
+	--bs-table-color: var(--ink);
+	--bs-table-border-color: var(--line);
+	--bs-table-striped-bg: #faf6ea;
+	--bs-table-striped-color: var(--ink);
+	--bs-table-hover-bg: var(--gold-soft);
+	--bs-table-hover-color: var(--ink);
+	margin-bottom: 1rem;
+}
+
+table[border],
+table.table {
+	border-collapse: collapse;
+	border: 1px solid var(--line);
+	background: #fff;
+	box-shadow: var(--shadow);
+}
+table[border] { width: calc(100% - (var(--gutter) * 2)); margin-top: .5rem; margin-bottom: 1.5rem; }
+
+table[border] th,
+table[border] td {
+	border: 1px solid var(--line);
+	padding: .5rem .5rem;
+	vertical-align: middle;
+	font-size: .92rem;
+}
+/* buttons and links inside wide record tables stay small so every column fits */
+table[border] td button,
+table[border] td input[type="submit"] {
+	white-space: nowrap;
+	padding: .3rem .7rem;
+	font-size: .88rem;
+}
+table[border] th { padding: .55rem .45rem; font-size: .72rem; letter-spacing: .04em; }
+table[border] td a[href^="user_feedback.php"] { padding: .3rem .6rem; font-size: .88rem; white-space: normal; }
+table[border] tr:nth-child(odd) > td { background: #faf6ea; }
+table[border] tr:hover > td { background: var(--gold-soft); }
+
+/* header cells */
+:is(table, .table) th {
+	background: var(--navy);
+	color: #fff;
+	font-family: var(--font-body);
+	font-size: .8rem;
+	font-weight: 700;
+	letter-spacing: .07em;
+	text-transform: uppercase;
+	border-color: var(--navy-dark) !important;
+	border-bottom: 3px solid var(--gold) !important;
+	box-shadow: none;
+	vertical-align: middle;
+}
+/* a <th> sitting beside a <td> is a row label (e.g. Account Details) */
+/* (prefixed so it outranks the header-cell rule above) */
+:is(table, .table) tr:has(> td) > th {
+	background: var(--navy-soft);
+	color: var(--navy);
+	text-transform: none;
+	letter-spacing: 0;
+	font-size: 1rem;
+	text-align: left;
+	border-color: var(--line) !important;
+	border-bottom: 1px solid var(--line) !important;
+	white-space: nowrap;
+}
+
+/* Bootstrap tables: the same ruled grid */
+.table > :not(caption) > * > * { padding: .65rem .8rem; }
+.table-bordered > :not(caption) > * > * { border-width: 1px; }
+
+/* Layout tables with no border (account details, complaint form) */
+table:not([border]):not(.table) {
+	border-collapse: separate;
+	border-spacing: 0;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-top: 5px solid var(--navy);
+	border-radius: 10px;
+	box-shadow: var(--shadow);
+	margin-top: 1rem;
+	margin-bottom: 1.5rem;
+	max-width: calc(100% - (var(--gutter) * 2));
+}
+table:not([border]):not(.table) > tbody > tr > td,
+table:not([border]):not(.table) > tbody > tr > th {
+	padding: .85rem 1.1rem;
+	border-bottom: 1px solid var(--line-soft);
+	vertical-align: top;
+}
+table:not([border]):not(.table) > tbody > tr:last-child > td,
+table:not([border]):not(.table) > tbody > tr:last-child > th { border-bottom: 0; }
+table:not([border]):not(.table) td:first-child:not(:only-child) {
+	font-weight: 700;
+	color: var(--navy);
+	white-space: nowrap;
+}
+table:not([border]):not(.table) td form { display: inline-block; margin-right: .5rem; }
+
+.table-responsive { border-radius: var(--radius); }
+
+/* highlight for overdue dates, <mark> in monitoring page */
+mark {
+	background: var(--red-soft);
+	color: var(--red);
+	font-weight: 700;
+	padding: .15rem .45rem;
+	border-radius: 4px;
+	border: 1px solid #f0b8b2;
+}
+
+/* thumbnails */
+td img, .img-thumbnail {
+	border-radius: 6px;
+	border: 2px solid var(--line);
+	padding: 2px;
+	background: #fff;
+	vertical-align: middle;
+}
+
+
+/* "Give Feedback" link in the citizen's complaint table — shown as a gold button */
+a[href^="user_feedback.php"] {
+	display: inline-block;
+	background: var(--gold);
+	color: var(--navy-dark);
+	font-weight: 700;
+	text-decoration: none;
+	padding: .45rem .9rem;
+	border: 2px solid var(--gold);
+	border-radius: 6px;
+	white-space: nowrap;
+}
+a[href^="user_feedback.php"]:hover { background: #ffc933; border-color: #ffc933; color: var(--navy-dark); }
+
+
+/* --------------------------------------------------------------------------
+   11. BADGES  (status / priority / announcement type)
+   -------------------------------------------------------------------------- */
+.badge {
+	font-family: var(--font-body);
+	font-weight: 700;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	border-radius: 4px;
+	padding: .38em .7em;
+	--bs-badge-color: #fff;
+}
+.badge.fs-6 { font-size: .8rem !important; }
+.badge.bg-warning, .badge.bg-info { --bs-badge-color: var(--navy-dark); color: var(--navy-dark); }
+
+
+/* --------------------------------------------------------------------------
+   12. ALERTS & MESSAGES
+   -------------------------------------------------------------------------- */
+.alert {
+	border: 1px solid transparent;
+	border-left-width: 6px;
+	border-radius: var(--radius);
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.alert-warning { color: #5a4300; background: var(--gold-soft); border-color: #f1d98a; border-left-color: var(--gold); }
+.alert-danger  { color: #7d1a14; background: var(--red-soft);  border-color: #f0b8b2; border-left-color: var(--red); }
+.alert-success { color: #1d5636; background: var(--green-soft); border-color: #b6dcc4; border-left-color: var(--green); }
+.alert-info    { color: var(--navy);  background: #e3f2fa; border-color: #b4dcef; border-left-color: var(--sky); }
+
+/* Messages written with inline styles in plain pages — restyled, HTML untouched */
+p[style*="color: red"], p[style*="color:red"] {
+	color: #7d1a14 !important;
+	background: var(--red-soft);
+	border: 1px solid #f0b8b2;
+	border-left: 6px solid var(--red);
+	border-radius: var(--radius);
+	padding: .7rem 1rem;
+	font-weight: 600;
+}
+p[style*="color: green"], p[style*="color:green"] {
+	color: #1d5636 !important;
+	background: var(--green-soft);
+	border: 1px solid #b6dcc4;
+	border-left: 6px solid var(--green);
+	border-radius: var(--radius);
+	padding: .7rem 1rem;
+}
+span[style*="color:gray"], span[style*="color: gray"] {
+	color: var(--muted) !important;
+	font-style: italic;
+	font-size: .9rem;
+}
+
+/* Announcement boxes written with inline styles — turned into notice cards */
+div[style*="border:1px solid #999"] {
+	background: var(--card);
+	border: 1px solid var(--line) !important;
+	border-left: 6px solid var(--gold) !important;
+	border-radius: 10px;
+	box-shadow: var(--shadow);
+	padding: 1rem 1.25rem !important;
+	margin-bottom: 1rem !important;
+}
+div[style*="border:1px solid #999"] h3 {
+	margin: .45rem 0 .15rem !important;
+	font-size: 1.15rem;
+}
+div[style*="border:1px solid #999"] p { margin: .6rem 0 0; }
+
+
+/* --------------------------------------------------------------------------
+   13. PAGINATION
+   -------------------------------------------------------------------------- */
+.pagination {
+	--bs-pagination-color: var(--navy);
+	--bs-pagination-bg: #fff;
+	--bs-pagination-border-color: var(--line);
+	--bs-pagination-hover-color: var(--navy-dark);
+	--bs-pagination-hover-bg: var(--gold-soft);
+	--bs-pagination-hover-border-color: var(--gold);
+	--bs-pagination-focus-color: var(--navy-dark);
+	--bs-pagination-focus-bg: var(--gold-soft);
+	--bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(242, 183, 5, .45);
+	--bs-pagination-active-color: #fff;
+	--bs-pagination-active-bg: var(--navy);
+	--bs-pagination-active-border-color: var(--navy);
+	--bs-pagination-disabled-color: var(--muted);
+	--bs-pagination-disabled-bg: var(--line-soft);
+	--bs-pagination-font-size: 1rem;
+	font-weight: 700;
+}
+
+
+/* --------------------------------------------------------------------------
+   14. SMALL SCREENS
+   -------------------------------------------------------------------------- */
+@media (max-width: 1199.98px) {
+	table[border] { display: block; overflow-x: auto; }
+}
+
+@media (max-width: 767.98px) {
+	:root { --gutter: 1rem; }
+	h1 { padding: .7rem .9rem; border-left-width: 6px; }
+	.card[class*="bg-"] h2 { font-size: 1.9rem; }
+	/* dashboard tiles: two per row */
+	.row > .col { flex: 1 0 45%; }
+	.navbar .nav-link { padding: .6rem .3rem; font-size: .9rem; }
+	.card.show { padding: 1.25rem !important; }
+}
+
+
+/* --------------------------------------------------------------------------
+   15. PRINT  (reports and complaint lists get printed at the hall)
+   -------------------------------------------------------------------------- */
+@media print {
+	html { background: #fff; }
+	body { padding-top: 0; }
+	.navbar, button, .btn, input[type="submit"], td form { display: none !important; }
+	h1 { background: none; color: var(--navy); border: 0; box-shadow: none; padding: 0; }
+	.card, table { box-shadow: none !important; }
+	:is(table, .table) th, .badge, .card[class*="bg-"] {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+	a { color: inherit; text-decoration: none; }
+}

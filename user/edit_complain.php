@@ -89,6 +89,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Edit Complaint</title>
+	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
 	<h1>Edit Complaint</h1>

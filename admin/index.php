@@ -20,6 +20,7 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
 	<h1>Admin!</h1>

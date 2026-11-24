@@ -29,6 +29,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>Choose Category</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
 	<h1>What is your complaint about?</h1>

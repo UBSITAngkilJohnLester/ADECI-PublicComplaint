@@ -69,6 +69,7 @@ $announcements = $prep->fetchAll();
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Barangay Camp 7: Service Monitoring System</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
+	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 
 <body>
@@ -216,14 +217,17 @@ $announcements = $prep->fetchAll();
 						<button type="button" disabled>Edit</button>
 					<?php endif; ?>
 				</td>
+
 				<td>
 					<?php if ($row['status'] == 'Pending'): ?>
 						<a href="delete_complain.php?id=<?php echo $row['ID']; ?>"
-							onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
+						class="btn btn-danger btn-sm"
+						onclick="return confirm('Are you sure you want to delete this complaint? This cannot be undone.');">Delete</a>
 					<?php else: ?>
-						<button type="button" disabled>Delete</button>
+						<button type="button" class="btn btn-danger btn-sm" disabled>Delete</button>
 					<?php endif; ?>
 				</td>
+
 				<td>
 					<?php if ($row['status'] == 'Pending' || $row['status'] == 'Under Investigation' || $row['status'] == 'Action Taken') { ?>
 						<span style="color:gray;">Please wait for further updates</span>

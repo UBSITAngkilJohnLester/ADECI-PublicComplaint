@@ -31,6 +31,25 @@
 	<title>Choose Category</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/barangay.css">
+	<style>
+	    .back-btn {
+	        display: inline-block;
+	        vertical-align: middle;
+	        box-sizing: border-box;
+	        font-size: 1.1rem;
+	        font-weight: 700;
+	        line-height: 1.2;
+	        padding: .4rem 1.25rem;
+	        border: 2px solid #0b2a5b;
+	        border-radius: .4rem;
+	        background: #fff;
+	        color: #0b2a5b;
+	        text-decoration: none;
+	    }
+	    .back-btn:hover { background: #0b2a5b; color: #fff; }
+	    table { display: table !important; width: 100% !important; }
+        table th, table td { width: 100% !important; }
+	</style>
 </head>
 <body>
 	<h1>What is your complaint about?</h1>
@@ -65,6 +84,6 @@
 
 	<p>Can't find it? <a href="insert_complain.php?category=Other+Concern">Other Concern</a></p>
 
-	<a href="index.php">Cancel</a>
+	<a href="index.php" class="back-btn">Cancel</a>
 </body>
 </html>

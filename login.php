@@ -29,7 +29,7 @@ if (isset($_POST['login'])) {
 
 				header("location:user/index.php");
 				exit();
-			} else if (password_verify($password, $row['password']) && $row['status'] == "barangay_captain") {
+			} else if (password_verify($password, $row['password']) && $row['status'] == "head_officer") {
 				$_SESSION['USERNAME'] = $row['username'];
 				$_SESSION['FIRSTNAME'] = $row['firstname'];
 				$_SESSION['ID'] = $row['ID'];

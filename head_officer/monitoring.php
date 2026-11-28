@@ -7,7 +7,7 @@ $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
 // check user is logged in and with the right credentials
-if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
+if (!isset($_SESSION['ID']) || $account['status'] != 'head_officer') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
@@ -76,7 +76,6 @@ $today = date("Y-m-d");
 </head>
 <body>
 	<div class="container-fluid p-4">
-	<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>

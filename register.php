@@ -136,7 +136,7 @@ if (isset($_POST['register'])) {
 				<div>
 					<div class="mb-3">
 						<label for="address" class="form-label">Address</label>
-						<input type="text" class="form-control" id="address" name="address" placeholder="e.g. Camp 7 Washingan" value="<?php echo $address ?>" required>
+						<input type="text" class="form-control" id="address" name="address" placeholder="e.g. Washingan, Kennon Rd." value="<?php echo $address ?>" required>
 					</div>
 				</div>
 				<div>

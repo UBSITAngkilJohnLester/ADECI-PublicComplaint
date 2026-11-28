@@ -56,8 +56,6 @@ $feedbacks = $prep->fetchAll();
 	<link rel="stylesheet" href="../assets/css/barangay.css">
 </head>
 <body>
-	<div class="container-fluid p-4">
-	<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
 	<nav class="navbar bg-secondary-subtle sticky-top p-1">
 		<div class="container-fluid d-flex justify-content-start gap-4">
 			<a href="index.php" class="nav-item nav-link">Dashboard</a>
@@ -66,7 +64,8 @@ $feedbacks = $prep->fetchAll();
 			<a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
 		</div>
 	</nav>
-	<hr>
+
+	<div class="container-fluid p-4">
 
 	<h2 class="mb-4">Citizen Feedback: <?php echo htmlspecialchars($department); ?></h2>
 

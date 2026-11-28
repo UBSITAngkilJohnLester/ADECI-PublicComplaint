@@ -7,7 +7,7 @@ $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
+if (!isset($_SESSION['ID']) || $account['status'] != 'head_officer') {
     session_destroy();
     header("location:../index.php");
     exit();
@@ -33,9 +33,34 @@ $row = $prep->fetch();
 </head>
 
 <style>
-    html {
-        scrollbar-gutter: stable;
+    html { scrollbar-gutter: stable;}
+
+    .account-wrap { max-width: 760px; margin: 1rem auto; padding: 0 1rem; }
+    .account-wrap h1 { text-align: center; font-size: 2.1rem; margin-bottom: 1rem; }
+    .account-wrap table { width: 100% !important; margin: 0 auto; }
+    .account-wrap th { font-size: 1.4rem; width: 45%; padding: 1rem 1.25rem !important; }
+    .account-wrap td { font-size: 1.6rem; padding: 1rem 1.25rem !important; }
+    .account-wrap button,
+    .account-wrap a { font-size: 1.4rem; }
+    .account-wrap button { padding: .6rem 1.75rem; margin-right: 1.25rem; }
+    .account-wrap td form { display: inline-block; vertical-align: middle; }
+    .account-wrap td a { vertical-align: middle; }
+    .account-wrap button,
+    .account-wrap .back-btn {
+        display: inline-block;
+        vertical-align: middle;
+        box-sizing: border-box;
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 1.2;
+        padding: .6rem 1.75rem;
+        border: 2px solid #0b2a5b;
+        border-radius: .5rem;
+        margin-right: 1rem;
     }
+    .account-wrap button { background: #0b2a5b; color: #fff; }
+    .account-wrap .back-btn { background: #fff; color: #0b2a5b; text-decoration: none; }
+    .account-wrap .back-btn:hover { background: #0b2a5b; color: #fff; }
 </style>
 
 <body class="bg-secondary-subtle">
@@ -50,6 +75,7 @@ $row = $prep->fetch();
             <a href="logout.php" class="nav-item nav-link ms-auto">Logout</a>
         </div>
     </nav>
+    <div class="account-wrap">
     <h1>Account Details</h1>
     <table>
         <tr>
@@ -73,12 +99,13 @@ $row = $prep->fetch();
             <td><?php echo $row['username'] ?></td>
         </tr>
         <tr>
-            <td>
+            <td colspan="2">
                 <form action="edit_acc.php" method="post"><button name="edit_acc">Edit</button></form>
-                <a href="index.php">Back</a>
+                <a href="index.php" class="back-btn">Back</a>
             </td>
         </tr>
     </table>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js" integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu" crossorigin="anonymous"></script>
 </body>
 

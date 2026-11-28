@@ -26,31 +26,6 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$_SESSION['ID']]);
 $complaints = $stmt->fetchAll();
 
-$total = count($complaints);
-$pending = 0;
-$progress = 0;
-$actiontaken = 0;
-$resolved = 0;
-$rejected = 0;
-
-foreach ($complaints as $c) {
-	if ($c['status'] == "Pending") {
-		$pending++;
-	}
-	if ($c['status'] == "Under Investigation") {
-		$progress++;
-	}
-	if ($c['status'] == "Action Taken") {
-		$actiontaken++;
-	}
-	if ($c['status'] == "Resolved") {
-		$resolved++;
-	}
-	if ($c['status'] == "Rejected") {
-		$rejected++;
-	}
-}
-
 $badgeColors = [
 	'Service Advisory' => 'bg-danger',
 	'Public Announcement' => 'bg-primary',
@@ -70,6 +45,24 @@ $announcements = $prep->fetchAll();
 	<title>Barangay Camp 7: Service Monitoring System</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 	<link rel="stylesheet" href="../assets/css/barangay.css">
+	<style>
+	.col-lg-8 table { width: 100%; font-size: 1rem; }
+
+	.view-btn {
+	    display: inline-block;
+	    box-sizing: border-box;
+	    font-size: 1.1rem;
+	    font-weight: 700;
+	    line-height: 1.2;
+	    padding: .6rem 1.5rem;
+	    border: 2px solid #0b2a5b;
+	    border-radius: .5rem;
+	    background: #0b2a5b;
+	    color: #fff;
+	    text-decoration: none;
+	}
+	.view-btn:hover { background: #fff; color: #0b2a5b; }
+	</style>
 </head>
 
 <body>
@@ -85,61 +78,8 @@ $announcements = $prep->fetchAll();
         </nav>
 	<hr>
 
-	<div class="container-fluid mb-3">
-		<h2 class="mb-3">My Dashboard</h2>
-		<div class="row">
-			<div class="col">
-				<div class="card shadow-sm rounded p-3 bg-primary h-100">
-					<div class="card-body">
-						<h6 class="text-white">Total Complaints</h6>
-						<h2 class="text-white"><?php echo $total; ?></h2>
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="card shadow-sm rounded p-3 bg-warning h-100">
-					<div class="card-body">
-						<h6>Pending</h6>
-						<h2><?php echo $pending; ?></h2>
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="card shadow-sm rounded p-3 bg-info h-100">
-					<div class="card-body">
-						<h6>Under Investigation</h6>
-						<h2><?php echo $progress; ?></h2>
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="card shadow-sm rounded p-3 bg-secondary h-100">
-					<div class="card-body">
-						<h6 class="text-white">Action Taken</h6>
-						<h2 class="text-white"><?php echo $actiontaken; ?></h2>
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="card shadow-sm rounded p-3 bg-success h-100">
-					<div class="card-body">
-						<h6 class="text-white">Resolved</h6>
-						<h2 class="text-white"><?php echo $resolved; ?></h2>
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="card shadow-sm rounded p-3 bg-danger h-100">
-					<div class="card-body">
-						<h6 class="text-white">Rejected</h6>
-						<h2 class="text-white"><?php echo $rejected; ?></h2>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<hr>
-
+	<div class="row g-3 px-3">
+		<div class="col-lg-4">
 	<h2>Public Announcement</h2>
 	<?php if (count($announcements) == 0): ?>
 		<p>No announcements yet.</p>
@@ -153,9 +93,10 @@ $announcements = $prep->fetchAll();
 		</div>
 	<?php endforeach; ?>
 	<?php if (count($announcements) > 0): ?>
-		<p><a href="announcements.php">View all announcements</a></p>
+		<p><a href="announcements.php" class="view-btn">View all announcements</a></p>
 	<?php endif; ?>
-	<hr>
+	</div>
+	<div class="col-lg-8">
 
 	<h2>My Complaints</h2>
 
@@ -240,6 +181,8 @@ $announcements = $prep->fetchAll();
 				</td>
 			</tr>
 		<?php } ?>
+		</div>
+	</div>
 	</table>
 </body>
 

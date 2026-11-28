@@ -7,7 +7,7 @@ $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
 // check user is logged in and with the right credentials
-if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
+if (!isset($_SESSION['ID']) || $account['status'] != 'head_officer') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
@@ -58,6 +58,12 @@ if ($hasResponse) {
 	<title>Reports and Analytics</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
 	<link rel="stylesheet" href="../assets/css/barangay.css">
+	<style>
+    	h2.no-accent { border-left: 0 !important; padding-left: 0 !important; }
+    	h2.no-accent::before,
+    	h2.no-accent::after { display: none !important; content: none !important; }
+    	
+	</style>
 </head>
 
 <body>
@@ -74,14 +80,14 @@ if ($hasResponse) {
 	</nav>
 
 	<div class="container-fluid p-4">
-		<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
-		<hr>
-		<h2 class="mb-4">Reports and Analytics</h2>
+		<h2 class="mb-4 text-center no-accent">Reports and Analytics</h2>
 
+		<div class="text-center">
 		<a href="reports_categories.php" class="btn btn-primary mb-4">View Complaints by Category</a>
+		</div>
 
-		<h3 class="mb-3">Resolution Rate by Department</h3>
-		<div class="col-md-8 mb-4">
+		<h3 class="mb-3 text-center">Resolution Rate by Department</h3>
+		<div class="col-md-8 mb-4 mx-auto">
 			<table class="table table-striped table-hover table-bordered text-center">
 				<tr>
 					<th>Department</th>
@@ -105,15 +111,15 @@ if ($hasResponse) {
 			</table>
 		</div>
 
-		<h3 class="mb-3">Average Response Time</h3>
+		<h3 class="mb-3 text-center">Average Response Time</h3>
 		<?php if (!$hasResponse): ?>
-			<div class="alert alert-warning col-md-8">
+			<div class="alert alert-warning col-md-8 mx-auto">
 				Not available yet. This needs Task 6.1 (the complaints column that records when staff first respond).
 				Once it is added, set <code>$responseColumn</code> at the top of this file to its name.
 			</div>
 		<?php else: ?>
-			<p><strong>Overall:</strong> <?php echo $overall === null ? 'No responses yet' : $overall . ' hours'; ?></p>
-			<div class="col-md-8">
+			<p class="text-center"><strong>Overall:</strong> <?php echo $overall === null ? 'No responses yet' : $overall . ' hours'; ?></p>
+			<div class="col-md-8 mx-auto">
 				<table class="table table-striped table-hover table-bordered text-center">
 					<tr>
 						<th>Department</th>

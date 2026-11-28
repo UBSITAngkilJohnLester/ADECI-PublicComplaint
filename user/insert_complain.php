@@ -153,7 +153,7 @@
 			</tr>
 			<tr>
 				<td><button type="submit" name="submit">Submit</button></td>
-				<td><a href="index.php">Cancel</a></td>
+				<td><a href="choose_category.php">Cancel</a></td>
 			</tr>
 
 		</table>

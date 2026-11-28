@@ -21,6 +21,9 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'admin') {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 	<link rel="stylesheet" href="../assets/css/barangay.css">
+	<style>
+    	table { display: table !important; width: 100% !important; }
+	</style>
 </head>
 <body>
 	<h1>Admin!</h1>

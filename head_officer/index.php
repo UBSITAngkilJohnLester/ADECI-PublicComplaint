@@ -7,7 +7,7 @@ $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
 // check user is logged in and with the right credentials
-if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
+if (!isset($_SESSION['ID']) || $account['status'] != 'head_officer') {
 	session_destroy();
 	header("location:../index.php");
 	exit();

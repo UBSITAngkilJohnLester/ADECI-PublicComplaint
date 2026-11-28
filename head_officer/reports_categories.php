@@ -7,7 +7,7 @@ $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
 // check user is logged in and with the right credentials
-if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
+if (!isset($_SESSION['ID']) || $account['status'] != 'head_officer') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
@@ -56,8 +56,6 @@ $cats = $prep->fetchAll();
 	</nav>
 
 	<div class="container-fluid p-4">
-		<h1 class="mb-2">Barangay Camp 7: Service Monitoring System</h1>
-		<hr>
 		<h2 class="mb-3">Complaints by Category</h2>
 		<a href="reports.php" class="btn btn-warning mb-3">Back to Reports</a>
 

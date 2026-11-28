@@ -12,7 +12,6 @@ $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-// check user is logged in and with the right credentials
 if (!$account || $account['status'] != 'secretary') {
 	session_destroy();
 	header("location:../index.php");
@@ -21,7 +20,6 @@ if (!$account || $account['status'] != 'secretary') {
 
 $department = "Katarungang Pambarangay";
 
-// average scores (only feedback on this department's complaints)
 $prep = $pdo->prepare("SELECT COUNT(*) AS total,
 		ROUND(AVG(feedback.satisfaction_rating), 1) AS overall,
 		ROUND(AVG(feedback.timeliness), 1) AS timeliness,
@@ -35,7 +33,6 @@ $prep = $pdo->prepare("SELECT COUNT(*) AS total,
 $prep->execute([":department" => $department]);
 $summary = $prep->fetch();
 
-// all feedback of this department
 $prep = $pdo->prepare("SELECT feedback.*, complaints.reference_no, complaints.department,
 		complaints.category, accounts.username
 	FROM feedback

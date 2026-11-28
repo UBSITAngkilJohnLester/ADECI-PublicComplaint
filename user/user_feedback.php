@@ -2,7 +2,6 @@
 	session_start();
 	require_once "../dbconn.php";
 
-	//check account status
 	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 	$prep->execute([$_SESSION['ID']]);
 	$account = $prep->fetch();
@@ -13,9 +12,6 @@
 		exit();
 	}
 
-	// The complaint ID comes from the link: user_feedback.php?id=5
-	// The complaint ID arrives once (from the link or from a form).
-	// Save it in the session, then reload this page with a clean URL.
 	if (isset($_GET['id'])) {
 		$_SESSION['feedback_complaint_id'] = $_GET['id'];
 		header("location:user_feedback.php");
@@ -27,14 +23,12 @@
 		exit();
 	}
 
-	// No complaint chosen: go back to the list.
 	if (!isset($_SESSION['feedback_complaint_id'])) {
 		header("location:index.php");
 		exit();
 	}
 	$complaintId = $_SESSION['feedback_complaint_id'];
 
-	// The complaint must belong to the logged-in user.
 	$select = $pdo->prepare("SELECT ID, reference_no, category FROM complaints WHERE ID = ? AND acc_id = ?");
 	$select->execute([$complaintId, $_SESSION['ID']]);
 	$complaint = $select->fetch();
@@ -45,7 +39,6 @@
 		exit();
 	}
 
-	// Only one feedback per complaint.
 	$check = $pdo->prepare("SELECT ID FROM feedback WHERE complaint_id = ? AND acc_id = ?");
 	$check->execute([$complaintId, $_SESSION['ID']]);
 	if ($check->fetch()) {
@@ -54,7 +47,6 @@
 		exit();
 	}
 
-	// Save the feedback when the form is submitted.
 	if (isset($_POST['submit'])) {
 		$insert = "INSERT INTO feedback
 			(complaint_id, acc_id, satisfaction_rating, comments, timeliness,
@@ -80,7 +72,6 @@
 		exit();
 	}
 
-	// 1 to 5 number rating as radio buttons.
 	function ratingRadio($name) {
 		$options = [5 => '5 - Excellent', 4 => '4 - Good', 3 => '3 - Neutral', 2 => '2 - Poor', 1 => '1 - Very Poor'];
 		foreach ($options as $value => $label) {
@@ -88,7 +79,6 @@
 		}
 	}
 
-	// Satisfied / Dissatisfied options as radio buttons.
 	function satisfactionRadio($name) {
 		$options = [5 => 'Very Satisfied', 4 => 'Satisfied', 3 => 'Neutral',
 					2 => 'Dissatisfied', 1 => 'Very Dissatisfied'];

@@ -2,7 +2,6 @@
 	session_start();
 	require_once "../dbconn.php";
 
-	//check account status
 	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 	$prep->execute([$_SESSION['ID']]);
 	$account = $prep->fetch();
@@ -13,7 +12,6 @@
 		exit();
 	}
 
-	// finds the complaint and makes sure it's pending before deletion
 	$select = "SELECT photo_path FROM complaints WHERE id = :id AND acc_id = :accId AND status = 'Pending'";
 	$prep = $pdo->prepare($select);
 	$prep->execute([
@@ -29,7 +27,6 @@
 			unlink($photo);
 		}
 
-		// deletes the complaint
 		$delete = "DELETE FROM complaints WHERE id = :id AND acc_id = :accId AND status = 'Pending'";
 		$prep = $pdo->prepare($delete);
 		$prep->execute([

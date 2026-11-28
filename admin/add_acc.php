@@ -2,7 +2,6 @@
 session_start();
 require_once "../dbconn.php";
 
-//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
@@ -120,7 +119,7 @@ if (isset($_POST['register'])) {
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select" name="status" id="status" required>
                                 <option value="" selected disabled>Status</option>
-                                <option value="head_officer">Barangay Captain</option>
+                                <option value="barangay_captain">Barangay Captain</option>
                                 <option value="secretary">Barangay Secretary</option>
                                 <option value="health_officer">Kagawad (Health and Sanitation)</option>
                                 <option value="environment_officer">Kagawad (Environment)</option>

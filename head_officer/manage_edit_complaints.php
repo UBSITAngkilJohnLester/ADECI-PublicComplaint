@@ -7,19 +7,16 @@ $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-// check user is logged in and with the right credentials
 if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
 }
 
-// [SECURITY 3] Make a CSRF token once per session (used by the form below).
 if (empty($_SESSION['csrf_token'])) {
 	$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// [DESIGN 1] Colors for each status (the words always stay visible).
 $badge = [
 	'Pending' => 'bg-warning text-white',
 	'Under Investigation' => 'bg-info text-white',
@@ -28,7 +25,6 @@ $badge = [
 	'Rejected' => 'bg-danger text-white'
 ];
 
-// Save the clicked complaint ID in the session, then clean the URL.
 if (isset($_POST['manage_id'])) {
 	$_SESSION['manage_id'] = $_POST['manage_id'];
 	header("location:manage_edit_complaints.php");
@@ -41,7 +37,6 @@ if (!isset($_SESSION['manage_id'])) {
 }
 $id = $_SESSION['manage_id'];
 
-// Load the complaint (no acc_id check, the admin can see all complaints).
 $select = $pdo->prepare("SELECT * FROM complaints WHERE ID = ?");
 $select->execute([$id]);
 $row = $select->fetch();
@@ -53,17 +48,14 @@ if (!$row) {
 
 $error = "";
 
-// Save when either the Update or the Mark as Resolved button is pressed.
 if (isset($_POST['update']) || isset($_POST['resolve'])) {
 
-	// [SECURITY 4] Stop the request if the CSRF token is missing or wrong.
 	$token = $_POST['csrf_token'] ?? '';
 	if (!hash_equals($_SESSION['csrf_token'], $token)) {
 		http_response_code(403);
 		exit("Invalid request.");
 	}
 
-	// The Resolved button sets the status by itself.
 	if (isset($_POST['resolve'])) {
 		$status = 'Resolved';
 	} else {
@@ -71,22 +63,19 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	}
 	$priority = $_POST['priority'];
 
-	// Empty priority means "Not set".
 	if ($priority == '') {
 		$priority = null;
 	}
 
-	// Empty deadline means "Not set".
 	$deadline = $_POST['deadline'];
 	if ($deadline == '') {
 		$deadline = null;
 	}
-	// A wrong date is treated as "Not set".
+
 	if ($deadline != null && strtotime($deadline) == false) {
 		$deadline = null;
 	}
 
-	// Only allow these statuses and priorities.
 	$statuses = ['Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'];
 	$priorities = ['Low', 'Medium', 'High'];
 
@@ -95,12 +84,10 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 		$responded = $row['date_responded'];
 		$resolved = $row['date_resolved'];
 
-		// First time it leaves Pending = responded.
 		if ($status != 'Pending' && $responded == '') {
 			$responded = date("Y-m-d H:i:s");
 		}
 
-		// First time it becomes Resolved = resolved.
 		if ($status == 'Resolved' && $resolved == '') {
 			$resolved = date("Y-m-d H:i:s");
 		}
@@ -131,10 +118,8 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Update Complaint Status</title>
 
-	<!-- [DESIGN 2] Bootswatch theme (same link as the other pages) -->
 	<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/flatly/bootstrap.min.css" rel="stylesheet">
 
-	<!-- [DESIGN 3] Bigger text for easier reading -->
 	<style>
 		html { font-size: 112.5%; }
 	</style>
@@ -160,14 +145,12 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 		<hr>
 		<h2 class="mb-4">Update Complaint Status</h2>
 
-		<!-- [DESIGN 6] Red box for error messages -->
 		<?php if ($error != ''): ?>
 			<div class="alert alert-danger fs-5"><?php echo htmlspecialchars($error); ?></div>
 		<?php endif; ?>
 
 		<div class="row">
 
-			<!-- [DESIGN 7] Complaint details (read-only) in a card -->
 			<div class="col-md-5 mb-4">
 				<div class="card shadow-sm p-3 h-100">
 					<h4 class="mb-3">Complaint Details</h4>
@@ -185,13 +168,11 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 				</div>
 			</div>
 
-			<!-- [DESIGN 8] Update form in a card -->
 			<div class="col-md-5 mb-4">
 				<div class="card shadow-sm p-3 h-100">
 					<h4 class="mb-3">Update</h4>
 					<form method="post">
 
-						<!-- [SECURITY 5] Hidden CSRF token -->
 						<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
 						<div class="mb-3">
@@ -217,7 +198,6 @@ if (isset($_POST['update']) || isset($_POST['resolve'])) {
 
 						<div class="mb-4">
 							<label for="deadline" class="form-label fw-bold">Deadline</label>
-							<!-- [SECURITY 6] htmlspecialchars on the deadline -->
 							<input type="date" name="deadline" id="deadline" class="form-control form-control-lg" value="<?php echo htmlspecialchars($row['deadline'] ?? ''); ?>">
 						</div>
 

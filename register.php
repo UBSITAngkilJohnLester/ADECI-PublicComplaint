@@ -41,7 +41,6 @@ if (isset($_POST['register'])) {
 		$wrongcontact = "Invalid contact number.";
 		$contact = "";
 	} else {
-		// contact number must not already belong to another account
 		$prep = $pdo->prepare("SELECT ID FROM accounts WHERE contact_number = ?");
 		$prep->execute([$contact]);
 

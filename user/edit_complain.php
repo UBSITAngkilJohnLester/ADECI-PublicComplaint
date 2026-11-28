@@ -2,7 +2,6 @@
 	session_start();
 	require_once "../dbconn.php";
 
-	//check account status
 	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 	$prep->execute([$_SESSION['ID']]);
 	$account = $prep->fetch();
@@ -13,26 +12,22 @@
 		exit();
 	}
 
-	// Save the clicked complaint ID in the session, then clean the URL.
 	if (isset($_POST['edit_id'])) {
 		$_SESSION['edit_id'] = $_POST['edit_id'];
 		header("location:edit_complain.php");
 		exit();
 	}
 
-	// Get the complaint ID from the URL.
 	if (!isset($_SESSION['edit_id'])) {
 		header("location:index.php");
 		exit();
 	}
 	$id = $_SESSION['edit_id'];
 
-	// Load the current complaint (only if it belongs to the user).
 	$select = $pdo->prepare("SELECT * FROM complaints WHERE ID = ? AND acc_id = ?");
 	$select->execute([$id, $_SESSION['ID']]);
 	$row = $select->fetch();
 
-	// Only Pending complaints can be edited.
 	if (!$row || $row ['status'] != 'Pending') {
 		header("location:index.php");
 		exit(); 
@@ -40,13 +35,11 @@
 
 	$error = "";
 
-	// Save changes when the form is submitted.
 	if (isset($_POST['update'])) {
 		$description = $_POST['description'];
 		$street = $_POST['street'];
 		$landmark = $_POST['landmark'];
 
-		// Keep the old photo unless a new one is uploaded.
 		$photo_path = $row['photo_path'];
 
 		if ($_FILES['photo']['name'] != '') {

@@ -1,12 +1,12 @@
 <?php
 session_start();
 require_once "../dbconn.php";
+require_once "../cleanup.php";
 
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-// check user is logged in and with the right credentials
 if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");
@@ -21,15 +21,14 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 		'Rejected' => 'bg-danger text-white'
 	];	
 
+deleteOldComplaints($pdo);
 
-// which department did the admin pick? (empty = none yet)
 $department = "";
 if (isset($_GET['department'])) {
 	$department = $_GET['department'];
 }
 
 if ($department == "") {
-	// step 1: list of departments + all complaints (for the counts)
 	$prep = $pdo->prepare("SELECT DISTINCT department FROM categories");
 	$prep->execute();
 	$departments = $prep->fetchAll();
@@ -38,14 +37,29 @@ if ($department == "") {
 	$prep->execute();
 	$all = $prep->fetchAll();
 } else {
-	// step 2: complaints of the picked department, Pending first, oldest first
-	$prep = $pdo->prepare("SELECT complaints.*, accounts.username
+	$prep = $pdo->prepare("SELECT complaints.*, accounts.username,
+			((complaints.status = 'Rejected' AND complaints.closed_at < NOW() - INTERVAL 7 DAY)
+			OR (complaints.status = 'Resolved' AND complaints.closed_at < NOW() - INTERVAL 30 DAY)) AS is_old
 		FROM complaints
 		JOIN accounts ON complaints.acc_id = accounts.ID
 		WHERE complaints.department = :department
 		ORDER BY FIELD(complaints.status, 'Pending', 'Under Investigation', 'Action Taken', 'Resolved', 'Rejected'), complaints.ID ASC");
 	$prep->execute([":department" => $department]);
 	$complaints = $prep->fetchAll();
+
+	$showAll = isset($_GET['show']) && $_GET['show'] == 'all';
+	$hidden = 0;
+	if (!$showAll) {
+		$visible = [];
+		foreach ($complaints as $c) {
+			if ($c['is_old']) {
+				$hidden++;
+			} else {
+				$visible[] = $c;
+			}
+		}
+		$complaints = $visible;
+	}
 }
 ?>
 <!DOCTYPE html>
@@ -118,6 +132,13 @@ if ($department == "") {
 
 		<h3><?php echo htmlspecialchars($department); ?></h3>
 		<p><a href="manage_complaints.php" class="btn btn-warning btn-lg mb-3">Back to departments</a></p>
+		<p>
+			<?php if ($showAll): ?>
+				<a href="manage_complaints.php?department=<?php echo urlencode($department); ?>" class="btn btn-secondary">Hide old complaints</a>
+			<?php else: ?>
+				<a href="manage_complaints.php?department=<?php echo urlencode($department); ?>&show=all" class="btn btn-secondary">Show all (<?php echo $hidden; ?> hidden)</a>
+			<?php endif; ?>
+		</p>
 
 		<div class="table-responsive">
 		<table class="table table-striped table-hover table-bordered align-middle">
@@ -136,7 +157,7 @@ if ($department == "") {
 			</tr>
 			<?php if (count($complaints) == 0): ?>
 				<tr>
-					<td colspan="11">No complaints for this department.</td>
+					<td colspan="11">No complaints to show.</td>
 				</tr>
 			<?php endif; ?>
 			<?php foreach ($complaints as $c): ?>

@@ -6,7 +6,6 @@ $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-// check user is logged in and with the right credentials
 if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");

@@ -2,7 +2,6 @@
 	require_once "../dbconn.php";
 	session_start();
 
-	//check account status
 	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 	$prep->execute([$_SESSION['ID']]);
 	$account = $prep->fetch();
@@ -15,7 +14,6 @@
 
 	$errors = [];
 
-	// retrieves the category
 	$category = $_POST['category'] ?? $_GET['category'] ?? '';
 
 	$sql = "SELECT * FROM categories WHERE category = ?";
@@ -23,14 +21,12 @@
 	$prep->execute([$category]);
 	$rows = $prep->fetchAll();
 
-	// no valid category, It goes back to choosing a category
 	if (count($rows) < 1) {
 		header("location:choose_category.php");
 		exit();
 	}
 	$department = $rows[0]['department'];
 
-	// start empty, so the form has something to show on the first visit
 	$description = "";
 	$street      = "";
 	$landmark    = "";
@@ -45,7 +41,6 @@
 			$errors[] = "Please fill in all required fields.";
 		}
 
-		// photo checks (optional)
 		$ext = '';
 		if ($_FILES['photo']['error'] != UPLOAD_ERR_NO_FILE) {
 
@@ -64,7 +59,6 @@
 			}
 		}
 
-		// saves the photo only if everything is fine
 		if (empty($errors) && $ext != '') {
 			$newName = uniqid('complaint_') . '.' . $ext;
 			move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . $newName);
@@ -72,7 +66,6 @@
 		}
 
 
-		//if no errors, the function is allowed to run
 		if (empty($errors)) {
 			$barangay = "Camp 7";
 			$reference  = "CMP-" . date("Ymd") . "-" . rand(1000, 9999);
@@ -93,7 +86,6 @@
 			]);
 
 
-			//condition if it was succesful
 			if ($saved) {
 				$_SESSION['success'] = "Complaint successfully added! Your reference number is: " . $reference;
 				header("location:index.php");

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "../dbconn.php";
+require_once "../cleanup.php";
 
 if (!isset($_SESSION['ID'])) {
     session_destroy();
@@ -8,7 +9,6 @@ if (!isset($_SESSION['ID'])) {
     exit();
 }
 
-//check account status
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
@@ -18,6 +18,8 @@ if (!$account || $account['status'] != 'health_officer') {
     header("location:../index.php");
     exit();
 }
+
+deleteOldComplaints($pdo);
 
 $badge = [
     'Pending' => 'bg-warning text-white',
@@ -29,8 +31,9 @@ $badge = [
 
 $department = "Health and Sanitation";
 
-// complaints of this department, Pending first, oldest first
-$prep = $pdo->prepare("SELECT complaints.*, accounts.username
+$prep = $pdo->prepare("SELECT complaints.*, accounts.username,
+        ((complaints.status = 'Rejected' AND complaints.closed_at < NOW() - INTERVAL 7 DAY)
+        OR (complaints.status = 'Resolved' AND complaints.closed_at < NOW() - INTERVAL 30 DAY)) AS is_old
     FROM complaints
     JOIN accounts ON complaints.acc_id = accounts.ID
     WHERE complaints.department = :department
@@ -38,7 +41,6 @@ $prep = $pdo->prepare("SELECT complaints.*, accounts.username
 $prep->execute([":department" => $department]);
 $complaints = $prep->fetchAll();
 
-// status counters (from the complaints already loaded)
 $total = count($complaints);
 $pending = 0;
 $progress = 0;
@@ -61,6 +63,14 @@ foreach ($complaints as $c) {
     }
     if ($c['status'] == "Rejected") {
         $rejected++;
+    }
+}
+
+$showAll = isset($_GET['show']) && $_GET['show'] == 'all';
+$visible = [];
+foreach ($complaints as $c) {
+    if ($showAll || !$c['is_old']) {
+        $visible[] = $c;
     }
 }
 ?>
@@ -142,6 +152,14 @@ foreach ($complaints as $c) {
             </div>
         </div>
 
+        <p>
+            <?php if ($showAll): ?>
+                <a href="index.php" class="btn btn-secondary">Hide old complaints</a>
+            <?php else: ?>
+                <a href="index.php?show=all" class="btn btn-secondary">Show all (<?php echo $total - count($visible); ?> hidden)</a>
+            <?php endif; ?>
+        </p>
+
         <div class="table-responsive">
             <table class="table table-striped table-hover table-bordered align-middle">
                 <tr>
@@ -157,12 +175,12 @@ foreach ($complaints as $c) {
                     <th>Photo</th>
                     <th>Actions</th>
                 </tr>
-                <?php if (count($complaints) == 0): ?>
+                <?php if (count($visible) == 0): ?>
                     <tr>
-                        <td colspan="11">No complaints for this department.</td>
+                        <td colspan="11">No complaints to show.</td>
                     </tr>
                 <?php endif; ?>
-                <?php foreach ($complaints as $c): ?>
+                <?php foreach ($visible as $c): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($c['reference_no']); ?></td>
                         <td><?php echo htmlspecialchars($c['username']); ?></td>

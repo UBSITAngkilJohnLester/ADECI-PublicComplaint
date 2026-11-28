@@ -2,7 +2,6 @@
 	session_start();
 	require_once "../dbconn.php";
 
-	//check account status
 	$prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 	$prep->execute([$_SESSION['ID']]);
 	$account = $prep->fetch();
@@ -18,7 +17,6 @@
 		$search = trim($_GET['search']);
 	}
 
-	// "Other Concern" is left out of the list, it has its own link at the bottom
 	$sql = "SELECT * FROM categories WHERE category LIKE ? AND category != 'Other Concern'";
 	$prep = $pdo->prepare($sql);
 	$prep->execute(["%" . $search . "%"]);

@@ -6,14 +6,12 @@ $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-// check user is logged in and with the right credentials
 if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
 }
 
-// turns a number of hours into text like "1d 4h" or "35m"
 function format_hours($hours)
 {
 	if ($hours === null) {
@@ -32,7 +30,6 @@ function format_hours($hours)
 	return $hrs . "h " . ($minutes % 60) . "m";
 }
 
-// Task 6.2: average response time and resolution time
 $prep = $pdo->prepare("SELECT
 		AVG(TIMESTAMPDIFF(MINUTE, date_submitted, date_responded)) / 60 AS avg_response,
 		AVG(TIMESTAMPDIFF(MINUTE, date_submitted, date_resolved)) / 60 AS avg_resolution
@@ -40,7 +37,6 @@ $prep = $pdo->prepare("SELECT
 $prep->execute();
 $times = $prep->fetch();
 
-// Task 6.3: department performance (one row per department)
 $prep = $pdo->prepare("SELECT c.department,
 		COUNT(DISTINCT c.ID) AS total,
 		COUNT(DISTINCT CASE WHEN c.status = 'Resolved' THEN c.ID END) AS resolved,
@@ -53,11 +49,10 @@ $prep = $pdo->prepare("SELECT c.department,
 $prep->execute();
 $departments = $prep->fetchAll();
 
-// Task 6.4: unresolved complaints (Pending / In Progress), oldest first
 $prep = $pdo->prepare("SELECT complaints.*, accounts.username
 	FROM complaints
 	JOIN accounts ON complaints.acc_id = accounts.ID
-	WHERE complaints.status IN ('Pending', 'In Progress')
+	WHERE complaints.status IN ('Pending', 'Under Investigation', 'Action Taken')
 	ORDER BY complaints.date_submitted ASC, complaints.ID ASC");
 $prep->execute();
 $unresolved = $prep->fetchAll();
@@ -134,7 +129,7 @@ $today = date("Y-m-d");
 	</div>
 
 	<h3 class="mb-2">Needs Attention</h3>
-	<p>Pending and In Progress complaints, oldest first. Overdue ones are marked.</p>
+	<p>Unfinished complaints, oldest first. Overdue ones are marked.</p>
 	<div class="table-responsive">
 	<table class="table table-striped table-hover table-bordered align-middle text-center">
 		<tr>

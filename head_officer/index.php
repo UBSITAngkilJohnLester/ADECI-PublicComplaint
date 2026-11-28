@@ -1,19 +1,20 @@
 <?php
 session_start();
 require_once "../dbconn.php";
+require_once "../cleanup.php";
 
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
 $account = $prep->fetch();
 
-// check user is logged in and with the right credentials
 if (!isset($_SESSION['ID']) || $account['status'] != 'barangay_captain') {
 	session_destroy();
 	header("location:../index.php");
 	exit();
 }
 
-// all complaints (for the counters)
+deleteOldComplaints($pdo);
+
 $prep = $pdo->prepare("SELECT * FROM complaints");
 $prep->execute();
 $row = $prep->fetchAll();
@@ -43,12 +44,10 @@ foreach ($row as $r) {
 	}
 }
 
-// complaints per department
 $prep = $pdo->prepare("SELECT department, COUNT(*) AS total FROM complaints GROUP BY department ORDER BY total DESC");
 $prep->execute();
 $departments = $prep->fetchAll();
 
-// latest 10 complaints
 $prep = $pdo->prepare("SELECT complaints.*, accounts.username
 		FROM complaints
 		JOIN accounts ON complaints.acc_id = accounts.ID
@@ -56,7 +55,6 @@ $prep = $pdo->prepare("SELECT complaints.*, accounts.username
 $prep->execute();
 $latest = $prep->fetchAll();
 
-// feedback: average scores
 $prep = $pdo->prepare("SELECT COUNT(*) AS total,
 			ROUND(AVG(satisfaction_rating), 1) AS overall,
 			ROUND(AVG(timeliness), 1) AS timeliness,

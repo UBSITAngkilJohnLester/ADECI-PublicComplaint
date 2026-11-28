@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "../dbconn.php";
+require_once "../cleanup.php";
 
 $prep = $pdo->prepare("SELECT status FROM accounts WHERE ID = ?");
 $prep->execute([$_SESSION['ID']]);
@@ -12,12 +13,16 @@ if (!isset($_SESSION['ID']) || $account['status'] != 'user') {
 	exit();
 }
 
+deleteOldComplaints($pdo);
+
 $sql = "SELECT * FROM complaints WHERE acc_id = ? ORDER BY ID DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$_SESSION['ID']]);
 $complaints = $stmt->fetchAll();
 
-$sql = "SELECT complaints.*, feedback.ID AS feedback_id
+$sql = "SELECT complaints.*, feedback.ID AS feedback_id,
+			((complaints.status = 'Rejected' AND complaints.closed_at < NOW() - INTERVAL 7 DAY)
+			OR (complaints.status = 'Resolved' AND complaints.closed_at < NOW() - INTERVAL 30 DAY)) AS is_old
 		FROM complaints
 		LEFT JOIN feedback ON feedback.complaint_id = complaints.ID
 		WHERE complaints.acc_id = ?
@@ -48,6 +53,14 @@ foreach ($complaints as $c) {
 	}
 	if ($c['status'] == "Rejected") {
 		$rejected++;
+	}
+}
+
+$showAll = isset($_GET['show']) && $_GET['show'] == 'all';
+$visible = [];
+foreach ($complaints as $c) {
+	if ($showAll || !$c['is_old']) {
+		$visible[] = $c;
 	}
 }
 
@@ -166,6 +179,14 @@ $announcements = $prep->fetchAll();
 
 	<p><a href="choose_category.php"><button type="button">+ Add Complaint</button></a></p>
 
+	<p>
+		<?php if ($showAll): ?>
+			<a href="index.php">Hide old complaints</a>
+		<?php else: ?>
+			<a href="index.php?show=all">Show all (<?php echo $total - count($visible); ?> hidden)</a>
+		<?php endif; ?>
+	</p>
+
 	<table border="1">
 		<tr>
 			<th>Reference No.</th>
@@ -180,13 +201,13 @@ $announcements = $prep->fetchAll();
 			<th colspan="2">FeedBack</th>
 		</tr>
 
-		<?php if (count($complaints) == 0) { ?>
+		<?php if (count($visible) == 0) { ?>
 			<tr>
-				<td colspan="10">No complaints yet.</td>
+				<td colspan="10">No complaints to show.</td>
 			</tr>
 		<?php } ?>
 
-		<?php foreach ($complaints as $row) { ?>
+		<?php foreach ($visible as $row) { ?>
 			<tr>
 				<td><?php echo htmlspecialchars($row['reference_no']); ?></td>
 				<td><?php echo htmlspecialchars($row['department']); ?></td>
